@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Bridge Studio — Sovereign Multi-Agent Bridge</title>
+  <!-- Google Fonts: Google Sans / Roboto / Roboto Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:ital,wght@0,400;0,500;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --md-sys-color-primary: #1a73e8;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-primary-container: #d2e3fc;
+      --md-sys-color-on-primary-container: #0d47a1;
+      --md-sys-color-secondary: #5f6368;
+      --md-sys-color-surface: #f8f9fa;
+      --md-sys-color-surface-container: #ffffff;
+      --md-sys-color-surface-container-high: #f1f3f4;
+      --md-sys-color-on-surface: #202124;
+      --md-sys-color-on-surface-variant: #5f6368;
+      --md-sys-color-outline: #dadce0;
+      --md-sys-color-outline-variant: #e8eaed;
+      
+      --google-blue: #1a73e8;
+      --google-blue-hover: #1557b0;
+      --google-red: #ea4335;
+      --google-yellow: #fbbc04;
+      --google-green: #34a853;
+      --google-purple: #9334e6;
+
+      --elevation-1: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+      --elevation-2: 0 1px 2px 0 rgba(60,64,67,0.3), 0 2px 6px 2px rgba(60,64,67,0.15);
+      --elevation-3: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    body.dark-theme {
+      --md-sys-color-primary: #8ab4f8;
+      --md-sys-color-on-primary: #202124;
+      --md-sys-color-primary-container: #1e3a5f;
+      --md-sys-color-on-primary-container: #d2e3fc;
+      --md-sys-color-secondary: #9aa0a6;
+      --md-sys-color-surface: #121212;
+      --md-sys-color-surface-container: #1e1e1e;
+      --md-sys-color-surface-container-high: #292a2d;
+      --md-sys-color-on-surface: #e8eaed;
+      --md-sys-color-on-surface-variant: #9aa0a6;
+      --md-sys-color-outline: #3c4043;
+      --md-sys-color-outline-variant: #2d2e30;
+      --google-blue: #8ab4f8;
+      --google-blue-hover: #aecbfa;
+      --elevation-1: 0 1px 3px 0 rgba(0,0,0,0.5);
+      --elevation-2: 0 2px 6px 2px rgba(0,0,0,0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Top Navigation Bar (Material 3 Top App Bar) */
+    header.app-bar {
+      background: var(--md-sys-color-surface-container);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--md-sys-color-primary-container);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--google-blue);
+    }
+
+    .brand-logo-icon svg { width: 22px; height: 22px; fill: currentColor; }
+
+    .brand-text h1 {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      color: var(--md-sys-color-on-surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      letter-spacing: 0.3px;
+    }
+
+    .app-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sse-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--google-green);
+      box-shadow: 0 0 0 0 rgba(52, 168, 83, 0.7);
+      animation: pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    .pulse-dot.error {
+      background: var(--google-red);
+      animation: none;
+    }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(52, 168, 83, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(52, 168, 83, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 168, 83, 0); }
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease-in-out;
+      outline: none;
+    }
+
+    .btn-filled {
+      background: var(--google-blue);
+      color: #ffffff;
+    }
+    .btn-filled:hover {
+      background: var(--google-blue-hover);
+      box-shadow: var(--elevation-1);
+    }
+
+    .btn-outlined {
+      background: transparent;
+      border-color: var(--md-sys-color-outline);
+      color: var(--md-sys-color-on-surface);
+    }
+    .btn-outlined:hover {
+      background: var(--md-sys-color-surface-container-high);
+      border-color: var(--google-blue);
+    }
+
+    .btn-text {
+      background: transparent;
+      color: var(--google-blue);
+      padding: 6px 12px;
+    }
+    .btn-text:hover {
+      background: var(--md-sys-color-primary-container);
+    }
+
+    .btn-danger {
+      background: var(--google-red);
+      color: #fff;
+    }
+
+    /* Main Container & Grid */
+    main.main-deck {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .grid-deck {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-9 { grid-column: span 9; }
+    .span-12 { grid-column: span 12; }
+
+    @media (max-width: 1200px) {
+      .span-3, .span-4, .span-5, .span-6, .span-7, .span-8, .span-9 {
+        grid-column: span 12;
+      }
+    }
+
+    /* M3 Surface Cards */
+    .card {
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      border-color: var(--md-sys-color-outline);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* Stats Overview Banner */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-pill {
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-val {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--google-blue);
+    }
+
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Live Feed / Telemetry Terminal */
+    .telemetry-deck {
+      height: 340px;
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      overflow-y: auto;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .telemetry-entry {
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--md-sys-color-surface-container);
+      border-left: 3px solid var(--google-blue);
+      word-break: break-all;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .telemetry-entry.sent { border-left-color: var(--google-blue); }
+    .telemetry-entry.broadcast { border-left-color: var(--google-purple); }
+    .telemetry-entry.consensus { border-left-color: var(--google-yellow); }
+    .telemetry-entry.claim { border-left-color: var(--google-green); }
+    .telemetry-entry.pulse { border-left-color: #00bcd4; }
+    .telemetry-entry.alert { border-left-color: var(--google-red); }
+
+    .entry-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .entry-badge {
+      font-size: 10px;
+      font-weight: bold;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-sent { background: #e8f0fe; color: #1a73e8; }
+    .badge-broadcast { background: #f3e8fd; color: #9334e6; }
+    .badge-consensus { background: #fef7e0; color: #b06000; }
+    .badge-claim { background: #e6f4ea; color: #137333; }
+    .badge-pulse { background: #e0f7fa; color: #00838f; }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .input-box, select.input-box, textarea.input-box {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      font-family: inherit;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: var(--radius-sm);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input-box:focus {
+      border-color: var(--google-blue);
+      box-shadow: 0 0 0 3px var(--md-sys-color-primary-container);
+    }
+
+    /* Channel Rows & Metrics */
+    .channel-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--md-sys-color-surface-container-high);
+      margin-bottom: 10px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .channel-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-bulb {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--google-green);
+    }
+
+    .channel-meta strong {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 14px;
+      display: block;
+    }
+
+    .channel-meta span {
+      font-size: 11.5px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* 3-Way Dialectic Consensus Visual Grid */
+    .consensus-matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 800px) {
+      .consensus-matrix { grid-template-columns: 1fr; }
+    }
+
+    .agent-pod {
+      border-radius: var(--radius-md);
+      padding: 14px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container-high);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pod-header {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pod-proponent { border-top: 4px solid var(--google-blue); }
+    .pod-skeptic { border-top: 4px solid var(--google-red); }
+    .pod-arbitrator { border-top: 4px solid var(--google-green); }
+
+    .pod-content {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--md-sys-color-on-surface-variant);
+      font-style: italic;
+    }
+
+    /* Claims Board Items */
+    .claim-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--md-sys-color-surface-container-high);
+      margin-bottom: 10px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .countdown-bar {
+      height: 4px;
+      width: 100%;
+      background: var(--md-sys-color-outline-variant);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .countdown-fill {
+      height: 100%;
+      background: var(--google-blue);
+      width: 75%;
+      transition: width 1s linear;
+    }
+
+    /* Watchdog Agent Items */
+    .watchdog-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--md-sys-color-surface-container-high);
+      margin-bottom: 10px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    footer.app-footer {
+      background: var(--md-sys-color-surface-container);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      padding: 14px 28px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Material 3 Top Navigation Bar -->
+  <header class="app-bar">
+    <div class="brand-section">
+      <div class="brand-logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Google Bridge Studio <span class="chip-badge">v0.1.0 Sovereign</span></h1>
+      </div>
+    </div>
+
+    <div class="app-actions">
+      <div class="sse-indicator" id="sse-banner">
+        <div class="pulse-dot" id="sse-dot"></div>
+        <span id="sse-status-text">SSE Live Telemetry</span>
+      </div>
+
+      <button class="btn btn-outlined" onclick="toggleTheme()" title="Toggle Dark / Light Mode">
+        <svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24">
+          <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
+        <span>Theme</span>
+      </button>
+
+      <button class="btn btn-filled" onclick="refreshDashboard()">
+        <svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24">
+          <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+        <span>Sync All</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Grid Deck -->
+  <main class="main-deck">
+
+    <!-- KPI Statistics Header -->
+    <section class="stats-strip">
+      <div class="stat-pill">
+        <span class="stat-val" id="kpi-uptime">0s</span>
+        <span class="stat-lbl">Uptime</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val" id="kpi-messages">0</span>
+        <span class="stat-lbl">Messages Sent</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val" id="kpi-broadcasts">0</span>
+        <span class="stat-lbl">Broadcasts</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val" id="kpi-claims">0</span>
+        <span class="stat-lbl">Active Claims</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val" id="kpi-consensus">0</span>
+        <span class="stat-lbl">Consensus Runs</span>
+      </div>
+    </section>
+
+    <div class="grid-deck">
+
+      <!-- Column 1: Multi-Channel Monitor (4 Cols) -->
+      <div class="span-4 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">Channel Monitor</div>
+          </div>
+          <span class="chip-badge" id="channels-badge">5 Online</span>
+        </div>
+        <p class="card-subtitle" style="margin-bottom:14px;">Privacy channels, long-polling relays & signed webhooks.</p>
+
+        <div id="channel-container">
+          <!-- Dynamic Channel Rows -->
+          <div class="channel-item">
+            <div class="channel-info">
+              <div class="status-bulb"></div>
+              <div class="channel-meta">
+                <strong>Signal Messenger</strong>
+                <span>+15550192834 • REST Daemon</span>
+              </div>
+            </div>
+            <span class="chip-badge">12.4ms</span>
+          </div>
+
+          <div class="channel-item">
+            <div class="channel-info">
+              <div class="status-bulb"></div>
+              <div class="channel-meta">
+                <strong>SimpleX Chat</strong>
+                <span>Stealth SMP Relay Node</span>
+              </div>
+            </div>
+            <span class="chip-badge">18.1ms</span>
+          </div>
+
+          <div class="channel-item">
+            <div class="channel-info">
+              <div class="status-bulb"></div>
+              <div class="channel-meta">
+                <strong>Telegram Bot API</strong>
+                <span>@SovereignAgentBridgeBot</span>
+              </div>
+            </div>
+            <span class="chip-badge">45.8ms</span>
+          </div>
+
+          <div class="channel-item">
+            <div class="channel-info">
+              <div class="status-bulb"></div>
+              <div class="channel-meta">
+                <strong>Matrix Protocol</strong>
+                <span>Federated Homeserver (matrix.org)</span>
+              </div>
+            </div>
+            <span class="chip-badge">62.3ms</span>
+          </div>
+
+          <div class="channel-item">
+            <div class="channel-info">
+              <div class="status-bulb"></div>
+              <div class="channel-meta">
+                <strong>HTTP Webhook</strong>
+                <span>HMAC-SHA256 Signed Pipe</span>
+              </div>
+            </div>
+            <span class="chip-badge">4.2ms</span>
+          </div>
+        </div>
+
+        <button class="btn btn-outlined" style="width:100%;margin-top:auto;" onclick="pingAllChannels()">
+          <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+          </svg>
+          <span>Ping Channel Latencies</span>
+        </button>
+      </div>
+
+      <!-- Column 2: Live SSE Event Stream & Telemetry Deck (8 Cols) -->
+      <div class="span-8 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">Live Telemetry & SSE Event Stream</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-text" onclick="filterFeed('all')">All</button>
+            <button class="btn btn-text" onclick="filterFeed('consensus')">Consensus</button>
+            <button class="btn btn-text" onclick="filterFeed('pulse')">Pulses</button>
+            <button class="btn btn-outlined" style="padding:4px 12px;font-size:11px;" onclick="clearEventFeed()">Clear</button>
+          </div>
+        </div>
+
+        <div id="event-feed" class="telemetry-deck">
+          <div class="telemetry-entry">
+            <div class="entry-meta">
+              <span class="entry-badge badge-sent">SYS</span>
+              <span>[Boot]</span>
+            </div>
+            <div>Sovereign Agent Bridge v0.1.0 initialized. Connected to /api/events SSE stream.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Message Dispatcher & Broadcast Console (6 Cols) -->
+      <div class="span-6 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">Interactive Dispatcher & Broadcast Console</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Channel Adapter</label>
+          <select id="dispatch-channel" class="input-box">
+            <option value="signal-primary">Signal Messenger (+15550192834)</option>
+            <option value="simplex-stealth">SimpleX Chat (SMP Node)</option>
+            <option value="telegram-relay">Telegram Bot Relay</option>
+            <option value="matrix-federated">Matrix Federated Room</option>
+            <option value="webhook-dispatch">HTTP Signed Webhook</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Recipient / Destination Address</label>
+          <input id="dispatch-recipient" class="input-box" type="text" placeholder="Phone number, Matrix room ID, or Chat ID" value="+15550192834">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Message Payload Content</label>
+          <textarea id="dispatch-content" class="input-box" rows="3" placeholder="Enter message payload...">Autonomous agent coordination sync: verified channel integrity.</textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:auto;">
+          <button class="btn btn-filled" style="flex:1;" onclick="dispatchSingleMessage()">
+            <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+            <span>Dispatch to Channel</span>
+          </button>
+          <button class="btn btn-outlined" style="flex:1;" onclick="dispatchBroadcast()">
+            <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24">
+              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+            </svg>
+            <span>Broadcast All Channels</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 2: 3-Way Dialectic Consensus Simulator (6 Cols) -->
+      <div class="span-6 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">3-Way Dialectic Consensus Engine</div>
+          </div>
+          <span class="chip-badge" id="consensus-badge" style="background:#e6f4ea;color:#137333;">Threshold 75%</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Deliberation Topic / Architectural Proposal</label>
+          <input id="consensus-input-topic" class="input-box" type="text" value="Upgrade P2P transport encryption to post-quantum Kyber-1024">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div class="form-group">
+            <label class="form-label">Proponent</label>
+            <input id="consensus-input-proponent" class="input-box" value="agent-alpha">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skeptic</label>
+            <input id="consensus-input-skeptic" class="input-box" value="agent-beta">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Arbitrator</label>
+            <input id="consensus-input-arbitrator" class="input-box" value="agent-gamma">
+          </div>
+        </div>
+
+        <!-- 3-Way Dialectic Visual Pods -->
+        <div class="consensus-matrix">
+          <div class="agent-pod pod-proponent">
+            <div class="pod-header" style="color:var(--google-blue);">Proponent</div>
+            <div class="pod-content" id="disp-proponent">"Kyber-1024 guards agent communications against future cryptographic harvest attacks."</div>
+          </div>
+          <div class="agent-pod pod-skeptic">
+            <div class="pod-header" style="color:var(--google-red);">Skeptic</div>
+            <div class="pod-content" id="disp-skeptic">"Key exchange payload increases frame size by 1.8KB. Evaluate bandwidth constrained channels."</div>
+          </div>
+          <div class="agent-pod pod-arbitrator">
+            <div class="pod-header" style="color:var(--google-green);">Arbitrator</div>
+            <div class="pod-content" id="disp-arbitrator">"Verdict: APPROVED. Apply Kyber-1024 for Signal & Matrix; use hybrid fallback on SMS."</div>
+          </div>
+        </div>
+
+        <button class="btn btn-filled" style="width:100%;margin-top:auto;" onclick="runDialecticConsensus()">
+          <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Run Dialectic Consensus Deliberation</span>
+        </button>
+      </div>
+
+      <!-- Row 3: Project Claims Lock Board (6 Cols) -->
+      <div class="span-6 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">Project Claims Lock Board</div>
+          </div>
+          <span class="chip-badge" id="claims-badge">Active Leases</span>
+        </div>
+
+        <div id="claims-container" style="min-height:160px;">
+          <!-- Dynamic Claims List -->
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.5fr 1.5fr 1fr;gap:8px;margin-top:auto;">
+          <input id="claim-new-project" class="input-box" placeholder="Project ID" value="sec-audit-task">
+          <input id="claim-new-agent" class="input-box" placeholder="Owner Agent" value="agent-alpha">
+          <button class="btn btn-filled" onclick="acquireProjectClaim()">Acquire Lock</button>
+        </div>
+      </div>
+
+      <!-- Row 3: Watchdog & Dead-Man Switch Deck (6 Cols) -->
+      <div class="span-6 card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">Watchdog & Dead-Man Switch</div>
+          </div>
+          <span class="chip-badge" id="watchdog-badge" style="background:#e0f7fa;color:#00838f;">Monitored</span>
+        </div>
+
+        <div id="watchdog-container" style="min-height:160px;">
+          <!-- Dynamic Watchdog List -->
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:8px;margin-top:auto;">
+          <input id="pulse-agent-input" class="input-box" placeholder="Agent ID" value="agent-alpha">
+          <button class="btn btn-outlined" onclick="sendHeartbeatPulse()">Send Pulse</button>
+          <button class="btn btn-danger" onclick="armDeadManSwitch()">Arm Switch (60s)</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>Google Bridge Studio • Sovereign Multi-Agent Communication Bridge • Pure Python Stdlib • Zero Dependencies</span>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // Theme toggle state
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('bridge_theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('bridge_theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+
+    // Telemetry logger
+    function appendTelemetry(type, data, meta = {}) {
+      const feed = document.getElementById('event-feed');
+      const entry = document.createElement('div');
+      entry.className = `telemetry-entry ${type.toLowerCase().split('_')[0]}`;
+      
+      const timeStr = new Date().toLocaleTimeString();
+      let badgeClass = 'badge-sent';
+      if (type.includes('broadcast')) badgeClass = 'badge-broadcast';
+      else if (type.includes('consensus')) badgeClass = 'badge-consensus';
+      else if (type.includes('claim')) badgeClass = 'badge-claim';
+      else if (type.includes('heartbeat') || type.includes('pulse')) badgeClass = 'badge-pulse';
+
+      entry.innerHTML = `
+        <div class="entry-meta">
+          <span class="entry-badge ${badgeClass}">${type}</span>
+          <span>${timeStr}</span>
+        </div>
+        <div style="font-size:11.5px;">${typeof data === 'string' ? data : JSON.stringify(data)}</div>
+      `;
+
+      feed.appendChild(entry);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function clearEventFeed() {
+      document.getElementById('event-feed').innerHTML = '';
+    }
+
+    function filterFeed(tag) {
+      // Simple filter mock
+      appendTelemetry('FILTER', `Applied filter: ${tag}`);
+    }
+
+    // Initialize Server-Sent Events (SSE)
+    function setupSSE() {
+      const sseSource = new EventSource('/api/events');
+      
+      sseSource.onopen = () => {
+        document.getElementById('sse-dot').className = 'pulse-dot';
+        document.getElementById('sse-status-text').innerText = 'SSE Live Telemetry';
+      };
+
+      sseSource.onerror = () => {
+        document.getElementById('sse-dot').className = 'pulse-dot error';
+        document.getElementById('sse-status-text').innerText = 'SSE Reconnecting...';
+      };
+
+      sseSource.onmessage = (evt) => {
+        try {
+          const payload = JSON.parse(evt.data);
+          appendTelemetry(payload.type || 'EVENT', payload.data || payload);
+        } catch {
+          appendTelemetry('RAW', evt.data);
+        }
+      };
+
+      // Custom Event Listeners
+      sseSource.addEventListener('message_sent', (e) => {
+        appendTelemetry('SENT', JSON.parse(e.data));
+        refreshStats();
+      });
+
+      sseSource.addEventListener('broadcast_sent', (e) => {
+        appendTelemetry('BROADCAST', JSON.parse(e.data));
+        refreshStats();
+      });
+
+      sseSource.addEventListener('consensus_completed', (e) => {
+        const d = JSON.parse(e.data);
+        appendTelemetry('CONSENSUS', d);
+        if (d.data && d.data.deliberation) {
+          const lastRound = d.data.deliberation[d.data.deliberation.length - 1];
+          document.getElementById('disp-proponent').innerText = `"${lastRound.proponent_argument}"`;
+          document.getElementById('disp-skeptic').innerText = `"${lastRound.skeptic_critique}"`;
+          document.getElementById('disp-arbitrator').innerText = `"${lastRound.arbitrator_synthesis}"`;
+        }
+        refreshStats();
+      });
+
+      sseSource.addEventListener('claim_acquired', (e) => {
+        appendTelemetry('CLAIM_ACQUIRED', JSON.parse(e.data));
+        fetchClaims();
+        refreshStats();
+      });
+
+      sseSource.addEventListener('claim_released', (e) => {
+        appendTelemetry('CLAIM_RELEASED', JSON.parse(e.data));
+        fetchClaims();
+        refreshStats();
+      });
+
+      sseSource.addEventListener('heartbeat_received', (e) => {
+        appendTelemetry('HEARTBEAT', JSON.parse(e.data));
+        fetchWatchdog();
+      });
+
+      sseSource.addEventListener('deadman_switch_armed', (e) => {
+        appendTelemetry('DEADMAN_ARMED', JSON.parse(e.data));
+        fetchWatchdog();
+      });
+    }
+
+    // REST API Actions
+    async function dispatchSingleMessage() {
+      const channel = document.getElementById('dispatch-channel').value;
+      const recipient = document.getElementById('dispatch-recipient').value;
+      const content = document.getElementById('dispatch-content').value;
+
+      try {
+        const res = await fetch('/api/send', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ channel, recipient, content })
+        });
+        const d = await res.json();
+        if (d.status === 'ok') {
+          appendTelemetry('DISPATCH_SUCCESS', `Dispatched to ${channel} -> ${recipient}`);
+        }
+      } catch (err) {
+        appendTelemetry('ERROR', `Failed to send: ${err}`);
+      }
+    }
+
+    async function dispatchBroadcast() {
+      const content = document.getElementById('dispatch-content').value;
+      try {
+        const res = await fetch('/api/broadcast', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ content })
+        });
+        const d = await res.json();
+        appendTelemetry('BROADCAST_TRIGGERED', `Broadcast sent across channels`);
+      } catch (err) {
+        appendTelemetry('ERROR', `Broadcast error: ${err}`);
+      }
+    }
+
+    async function runDialecticConsensus() {
+      const topic = document.getElementById('consensus-input-topic').value;
+      const proponent = document.getElementById('consensus-input-proponent').value;
+      const skeptic = document.getElementById('consensus-input-skeptic').value;
+      const arbitrator = document.getElementById('consensus-input-arbitrator').value;
+
+      try {
+        const res = await fetch('/api/consensus/run', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ topic, proponent, skeptic, arbitrator, rounds: 2, threshold: 0.75 })
+        });
+        const data = await res.json();
+        if (data.session && data.session.deliberation) {
+          const step = data.session.deliberation[0];
+          document.getElementById('disp-proponent').innerText = `"${step.proponent_argument}"`;
+          document.getElementById('disp-skeptic').innerText = `"${step.skeptic_critique}"`;
+          document.getElementById('disp-arbitrator').innerText = `"${step.arbitrator_synthesis}"`;
+        }
+      } catch (err) {
+        appendTelemetry('ERROR', `Consensus run error: ${err}`);
+      }
+    }
+
+    async function fetchClaims() {
+      try {
+        const res = await fetch('/api/claims');
+        const data = await res.json();
+        const container = document.getElementById('claims-container');
+        if (!data.claims || data.claims.length === 0) {
+          container.innerHTML = `<div style="color:var(--md-sys-color-on-surface-variant);font-size:12.5px;padding:12px 0;">No active claim locks.</div>`;
+          return;
+        }
+
+        container.innerHTML = data.claims.map(c => `
+          <div class="claim-item">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <strong>${c.project_id}</strong>
+                <span class="chip-badge">${c.owner_agent}</span>
+              </div>
+              <div style="font-size:11px;color:var(--md-sys-color-on-surface-variant);">
+                TTL: ${c.ttl_seconds}s
+              </div>
+              <div class="countdown-bar">
+                <div class="countdown-fill"></div>
+              </div>
+            </div>
+            <button class="btn btn-outlined" style="padding:4px 10px;font-size:11px;margin-left:12px;" onclick="releaseProjectClaim('${c.project_id}', '${c.owner_agent}')">
+              Release
+            </button>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error("Claims fetch error", e);
+      }
+    }
+
+    async function acquireProjectClaim() {
+      const project_id = document.getElementById('claim-new-project').value;
+      const agent_id = document.getElementById('claim-new-agent').value;
+      try {
+        await fetch('/api/claims/acquire', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ project_id, agent_id, ttl_seconds: 600 })
+        });
+        fetchClaims();
+      } catch (err) {
+        alert(err);
+      }
+    }
+
+    async function releaseProjectClaim(project_id, agent_id) {
+      try {
+        await fetch('/api/claims/release', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ project_id, agent_id })
+        });
+        fetchClaims();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function fetchWatchdog() {
+      try {
+        const res = await fetch('/api/watchdog');
+        const data = await res.json();
+        const container = document.getElementById('watchdog-container');
+        if (!data.agents || data.agents.length === 0) {
+          container.innerHTML = `<div style="color:var(--md-sys-color-on-surface-variant);font-size:12.5px;padding:12px 0;">No active agents registered.</div>`;
+          return;
+        }
+
+        container.innerHTML = data.agents.map(a => `
+          <div class="watchdog-item">
+            <div class="channel-info">
+              <div class="status-bulb" style="background:${a.status === 'DEAD' ? 'var(--google-red)' : (a.status === 'WARNING' ? 'var(--google-yellow)' : 'var(--google-green)')}"></div>
+              <div class="channel-meta">
+                <strong>${a.agent_id}</strong>
+                <span>Last Pulse: ${a.elapsed_seconds || 0}s ago • Status: ${a.status}</span>
+              </div>
+            </div>
+            <span class="chip-badge">Timeout: ${a.timeout}s</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error("Watchdog fetch error", e);
+      }
+    }
+
+    async function sendHeartbeatPulse() {
+      const agent_id = document.getElementById('pulse-agent-input').value;
+      await fetch('/api/heartbeat/ping', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ agent_id, interval: 30 })
+      });
+      fetchWatchdog();
+    }
+
+    async function armDeadManSwitch() {
+      const agent_id = document.getElementById('pulse-agent-input').value;
+      await fetch('/api/heartbeat/arm', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ agent_id, timer_seconds: 60 })
+      });
+      fetchWatchdog();
+    }
+
+    async function pingAllChannels() {
+      await fetch('/api/channels/test', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ channel: 'all' })
+      });
+    }
+
+    async function refreshStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const d = await res.json();
+        if (d.stats) {
+          document.getElementById('kpi-uptime').innerText = `${Math.round(d.stats.uptime_seconds)}s`;
+          document.getElementById('kpi-messages').innerText = d.stats.messages_sent;
+          document.getElementById('kpi-broadcasts').innerText = d.stats.broadcasts_sent;
+          document.getElementById('kpi-claims').innerText = d.stats.active_claims;
+          document.getElementById('kpi-consensus').innerText = d.stats.consensus_runs;
+        }
+      } catch (e) {}
+    }
+
+    function refreshDashboard() {
+      fetchClaims();
+      fetchWatchdog();
+      refreshStats();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setupSSE();
+      refreshDashboard();
+      setInterval(refreshStats, 5000);
+    });
+  </script>
+</body>
+</html>
