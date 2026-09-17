@@ -255,6 +255,17 @@ def broadcast_message(
     )
 
 
+try:
+    from .service_discovery import (
+        AgentCapabilityProfile,
+        ServiceRegistry,
+        MultiSigProposal,
+        compute_agent_signature,
+        verify_multisig_consensus,
+    )
+except ImportError:
+    pass
+
 __all__ = [
     "__version__",
     "__author__",
@@ -277,4 +288,9 @@ __all__ = [
     "record_pulse",
     "check_watchdog_liveness",
     "get_default_bridge",
+    "AgentCapabilityProfile",
+    "ServiceRegistry",
+    "MultiSigProposal",
+    "compute_agent_signature",
+    "verify_multisig_consensus",
 ]
