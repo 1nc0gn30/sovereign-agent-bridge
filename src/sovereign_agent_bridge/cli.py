@@ -3,7 +3,7 @@ Sovereign Agent Bridge - Command Line Interface (CLI) & Runtime Engine.
 
 Provides multi-OS terminal commands, MCP stdio runner, heartbeat watchdog monitor,
 claim mutex locks, 3-way dialectic consensus, system doctor diagnostics, self-test suite,
-and the embedded Google Material 3 Bridge Studio Web UI.
+and the embedded Bridge Studio Web UI (design influenced by Material 3).
 Zero external dependencies (pure Python standard library).
 """
 
@@ -1080,7 +1080,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_watch.add_argument("--webhook", help="Webhook URL for dead-man alerts.")
 
     # serve
-    p_serve = subparsers.add_parser("serve", help="Launch Google Material 3 Bridge Studio Web UI.")
+    p_serve = subparsers.add_parser("serve", help="Launch Bridge Studio Web UI (design influenced by Material 3).")
     p_serve.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1).")
     p_serve.add_argument("-p", "--port", type=int, default=8788, help="Port to bind (default: 8788).")
     p_serve.add_argument("--public-dir", help="Path to static web assets directory.")

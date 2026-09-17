@@ -1,6 +1,6 @@
 # 🏛️ Sovereign Agent Bridge
 
-> **Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, 3-Way Dialectic Consensus, Distributed Claim Locks, Dead-Man Watchdogs, Google Bridge Studio UI, and Model Context Protocol (MCP) support.**
+> **Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, 3-Way Dialectic Consensus, Distributed Claim Locks, Dead-Man Watchdogs, Bridge Studio UI (design influenced by Material 3), and Model Context Protocol (MCP) support.**
 
 [![CI](https://github.com/sovereign-agent-bridge/sovereign-agent-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/sovereign-agent-bridge/sovereign-agent-bridge/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
@@ -21,7 +21,7 @@ Built entirely using the **Python Standard Library (Zero External Runtime Depend
 
 ```
                     ┌──────────────────────────────────────────────┐
-                    │          Google Bridge Studio (Web UI)        │
+                    │               Bridge Studio (Web UI)         │
                     │   (Material 3 • SSE Stream • Telemetry Deck) │
                     └───────────────────────┬──────────────────────┘
                                             │ REST / SSE
@@ -83,8 +83,8 @@ Built entirely using the **Python Standard Library (Zero External Runtime Depend
 5. **Heartbeat Watchdog & Dead-Man Switch**
    - Real-time agent liveness monitoring (`ACTIVE` $\to$ `WARNING` $\to$ `DEAD` $\to$ `RECOVERED`).
    - Automated dead-man emergency alert dispatching via webhooks and multi-channel broadcasts.
-6. **Google Bridge Studio Web UI**
-   - Clean Google Material 3 Light/Dark interface.
+6. **Bridge Studio Web UI**
+   - Clean interface with design influenced by Material 3.
    - Real-time telemetry feed powered by Server-Sent Events (SSE `/api/events`).
    - Interactive message dispatcher, consensus simulator, claims lock board, and countdown dials.
 7. **Model Context Protocol (MCP) Server**
@@ -264,7 +264,7 @@ Add the Sovereign Agent Bridge MCP server to your **Claude Desktop** or **Antigr
 
 ---
 
-## 🌐 Google Bridge Studio Web Deck
+## 🌐 Bridge Studio Web Deck
 
 Run the local UI server:
 ```bash
@@ -272,7 +272,7 @@ sovereign-bridge serve --port 8765
 ```
 Open **`http://127.0.0.1:8765`** in your browser.
 
-- **Google Material 3 Aesthetic**: Google Sans typography, Google Blue `#1a73e8`, subtle elevation cards, chips, and dark theme support.
+- **Design Influenced by Material 3**: Typography, subtle elevation cards, chips, and dark theme support.
 - **Server-Sent Events (`/api/events`)**: Instantaneous live telemetry streaming.
 - **Interactive Multi-Channel Dispatcher**: Send test messages or broadcast alerts with real-time delivery receipts.
 - **Consensus Simulator**: Visual 3-way Proponent, Skeptic, and Arbitrator deliberation deck.

@@ -1,10 +1,10 @@
-"""Google Bridge Studio UI Server for Sovereign Agent Bridge.
+"""Bridge Studio UI Server for Sovereign Agent Bridge.
 
 Pure Python standard library HTTP server (ThreadingHTTPServer) providing:
 - Real-time Server-Sent Events (SSE) telemetry & event stream (/api/events)
 - REST APIs for multi-channel messaging, broadcast, claims lock board,
   3-way dialectic consensus, watchdog & dead-man switch monitoring
-- Static file serving for Google Material 3 Studio UI (public/index.html)
+- Static file serving for Bridge Studio UI (public/index.html, design influenced by Material 3)
 - Embedded UI fallback for standalone, zero-dependency zero-asset environments
 """
 
@@ -979,7 +979,7 @@ class BridgeUIServer:
         self.port = self._server.server_port  # Resolve dynamically bound port (if 0)
         self.is_running = True
 
-        logger.info("Google Bridge Studio running at http://%s:%d", self.host, self.port)
+        logger.info("Bridge Studio running at http://%s:%d", self.host, self.port)
 
         if blocking:
             try:
@@ -989,7 +989,7 @@ class BridgeUIServer:
         else:
             self._thread = threading.Thread(
                 target=self._server.serve_forever,
-                name="GoogleBridgeUIServer",
+                name="BridgeUIServer",
                 daemon=True,
             )
             self._thread.start()
@@ -1011,7 +1011,7 @@ class BridgeUIServer:
             self._thread.join(timeout=3.0)
             self._thread = None
 
-        logger.info("Google Bridge Studio stopped.")
+        logger.info("Bridge Studio stopped.")
 
     def get_url(self) -> str:
         """Return base URL string."""
@@ -1061,7 +1061,7 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Bridge Studio — Sovereign Agent Bridge</title>
+  <title>Bridge Studio — Sovereign Agent Bridge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -1073,115 +1073,47 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
       --google-red: #ea4335;
       --google-yellow: #fbbc04;
       --google-green: #34a853;
-      --surface-bg: #f8f9fa;
+      --bg: #f8f9fa;
       --card-bg: #ffffff;
-      --text-primary: #202124;
-      --text-secondary: #5f6368;
-      --border-color: #dadce0;
-      --divider-color: #f1f3f4;
-      --radius: 12px;
-      --shadow-1: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-      --shadow-2: 0 2px 6px 2px rgba(60,64,67,0.15);
+      --text: #202124;
+      --text-muted: #5f6368;
+      --border: #dadce0;
     }
     body.dark-mode {
-      --surface-bg: #121212;
+      --bg: #121212;
       --card-bg: #1e1e1e;
-      --text-primary: #e8eaed;
-      --text-secondary: #9aa0a6;
-      --border-color: #3c4043;
-      --divider-color: #2d2e30;
-      --google-blue-surface: #1e2838;
+      --text: #e8eaed;
+      --text-muted: #9aa0a6;
+      --border: #3c4043;
+      --google-blue-surface: #1e2a38;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--surface-bg);
-      color: var(--text-primary);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+    body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); padding: 20px; transition: background 0.2s, color 0.2s; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-logo { width: 32px; height: 32px; fill: var(--google-blue); }
     .brand-title { font-family: 'Google Sans', sans-serif; font-size: 20px; font-weight: 500; }
-    .badge {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 8px;
-      border-radius: 12px;
-      background: var(--google-blue-surface);
-      color: var(--google-blue);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .btn {
-      font-family: 'Google Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 18px;
-      border-radius: 20px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
+    .badge { background: var(--google-blue-surface); color: var(--google-blue); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 12px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: 0.15s; }
     .btn-primary { background: var(--google-blue); color: #fff; }
     .btn-primary:hover { background: var(--google-blue-hover); }
-    .btn-outline { background: transparent; border-color: var(--border-color); color: var(--text-primary); }
-    .btn-outline:hover { background: var(--divider-color); }
-    .container { max-width: 1440px; margin: 0 auto; padding: 24px; }
-    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
-    .col-4 { grid-column: span 4; }
-    .col-6 { grid-column: span 6; }
-    .col-8 { grid-column: span 8; }
-    .col-12 { grid-column: span 12; }
-    @media (max-width: 1024px) {
-      .col-4, .col-6, .col-8 { grid-column: span 12; }
-    }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--divider-color);
-    }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { background: var(--google-blue-surface); border-color: var(--google-blue); }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+    .col-4 { flex: 1 1 320px; }
+    .col-8 { flex: 2 1 600px; }
+    .col-6 { flex: 1 1 450px; }
+    .col-12 { flex: 1 1 100%; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
     .card-title { font-family: 'Google Sans', sans-serif; font-size: 16px; font-weight: 500; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .channel-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .channel-row:last-child { border-bottom: none; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     .dot-green { background: var(--google-green); }
-    .dot-red { background: var(--google-red); }
     .dot-yellow { background: var(--google-yellow); }
-    .live-feed {
-      height: 320px;
-      overflow-y: auto;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 12px;
-      background: var(--surface-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px;
-    }
-    .feed-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed var(--border-color); }
     .feed-time { color: var(--text-secondary); margin-right: 6px; }
     .feed-tag { font-weight: bold; color: var(--google-blue); }
     .form-group { margin-bottom: 14px; }
@@ -1212,7 +1144,7 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
       <svg class="brand-logo" viewBox="0 0 24 24">
         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
       </svg>
-      <div class="brand-title">Google Bridge Studio</div>
+      <div class="brand-title">Bridge Studio</div>
       <span class="badge">Sovereign v0.1.0</span>
     </div>
     <div class="header-actions">
@@ -1252,7 +1184,7 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
             <button class="btn btn-outline" style="padding:4px 10px;font-size:12px;" onclick="document.getElementById('event-stream').innerHTML=''">Clear</button>
           </div>
           <div id="event-stream" class="live-feed">
-            <div class="feed-item"><span class="feed-time">[Live]</span> <span class="feed-tag">SYSTEM</span> Google Bridge Studio initialized. Listening on SSE stream /api/events...</div>
+            <div class="feed-item"><span class="feed-time">[Live]</span> <span class="feed-tag">SYSTEM</span> Bridge Studio initialized. Listening on SSE stream /api/events...</div>
           </div>
         </div>
       </div>
