@@ -503,6 +503,22 @@ class MCPServer:
                     },
                 },
             },
+            {
+                "name": "bridge_fault_tolerance_metrics",
+                "description": (
+                    "Query adaptive circuit breaker health states across communication channels "
+                    "and retrieve anti-replay sliding window statistics."
+                ),
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "reset_channel": {
+                            "type": "string",
+                            "description": "Optional channel name to manually reset its circuit breaker.",
+                        },
+                    },
+                },
+            },
         ]
 
     # -----------------------------------------------------------------------
@@ -530,6 +546,8 @@ class MCPServer:
                 return self._tool_stats(arguments)
             elif name == "bridge_diagnostics":
                 return self._tool_diagnostics(arguments)
+            elif name == "bridge_fault_tolerance_metrics":
+                return self._tool_fault_tolerance_metrics(arguments)
             else:
                 raise ValueError(f"Unknown tool: '{name}'")
         except Exception as e:
@@ -900,6 +918,25 @@ class MCPServer:
 
         return {
             "content": [{"type": "text", "text": json.dumps(diag, indent=2)}],
+            "isError": False,
+        }
+
+    def _tool_fault_tolerance_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        from .fault_tolerance import get_circuit_registry, get_anti_replay_guard
+        reset_channel = args.get("reset_channel")
+        reg = get_circuit_registry()
+        guard = get_anti_replay_guard()
+
+        if reset_channel:
+            breaker = reg.get_or_create(reset_channel)
+            breaker.reset()
+
+        result = {
+            "circuits": reg.get_all_metrics(),
+            "anti_replay": guard.get_stats(),
+        }
+        return {
+            "content": [{"type": "text", "text": json.dumps(result, indent=2)}],
             "isError": False,
         }
 

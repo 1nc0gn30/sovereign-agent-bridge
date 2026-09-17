@@ -455,6 +455,15 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             self._send_json_response({"events": self.ui_server.broker.get_history(limit)})
             return
 
+        # 8b. Fault-Tolerance & Circuit Breaker Telemetry
+        if path in ("/api/resilience", "/api/circuits"):
+            from .fault_tolerance import get_circuit_registry, get_anti_replay_guard
+            self._send_json_response({
+                "circuits": get_circuit_registry().get_all_metrics(),
+                "anti_replay": get_anti_replay_guard().get_stats(),
+            })
+            return
+
         # 9. Static file serving or fallback to Embedded HTML Studio
         self._handle_static_or_fallback(path)
 
@@ -487,6 +496,12 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             self._handle_post_heartbeat_ping(body)
         elif path == "/api/heartbeat/arm":
             self._handle_post_heartbeat_arm(body)
+        elif path in ("/api/resilience/reset", "/api/circuits/reset"):
+            from .fault_tolerance import get_circuit_registry
+            chan = body.get("channel", "")
+            if chan:
+                get_circuit_registry().get_or_create(chan).reset()
+            self._send_json_response({"status": "reset", "channel": chan})
         elif path == "/api/events/publish":
             event_type = body.get("type", "custom_event")
             data = body.get("data", {})

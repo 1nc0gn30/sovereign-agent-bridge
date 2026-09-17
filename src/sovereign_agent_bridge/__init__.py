@@ -266,6 +266,21 @@ try:
 except ImportError:
     pass
 
+try:
+    from .fault_tolerance import (
+        CircuitBreaker,
+        CircuitState,
+        CircuitMetrics,
+        CircuitBreakerRegistry,
+        RetryPolicy,
+        AntiReplayGuard,
+        get_circuit_registry,
+        get_anti_replay_guard,
+        execute_resilient_channel_dispatch,
+    )
+except ImportError:
+    pass
+
 __all__ = [
     "__version__",
     "__author__",
@@ -293,4 +308,13 @@ __all__ = [
     "MultiSigProposal",
     "compute_agent_signature",
     "verify_multisig_consensus",
+    "CircuitBreaker",
+    "CircuitState",
+    "CircuitMetrics",
+    "CircuitBreakerRegistry",
+    "RetryPolicy",
+    "AntiReplayGuard",
+    "get_circuit_registry",
+    "get_anti_replay_guard",
+    "execute_resilient_channel_dispatch",
 ]
