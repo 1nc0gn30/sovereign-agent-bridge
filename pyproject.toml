@@ -22,6 +22,10 @@ keywords = [
     "consensus",
     "watchdog",
     "mcp",
+    "crypto-envelope",
+    "hkdf",
+    "federation-gateway",
+    "swarm-mesh",
     "zero-dependency"
 ]
 classifiers = [

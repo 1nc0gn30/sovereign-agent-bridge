@@ -543,6 +543,12 @@ class BridgeStudioHTTPHandler(SimpleHTTPRequestHandler):
         elif path == "/api/claims":
             claims_mgr = FallbackClaimManager()
             self._send_json({"claims": claims_mgr.list_claims()})
+        elif path in ("/api/federation", "/api/federation/topology"):
+            from .federation_gateway import FederationGateway
+            gw = FederationGateway(bridge_id="bridge-cli-node")
+            self._send_json(gw.get_topology())
+        elif path in ("/api/envelope", "/api/envelopes"):
+            self._send_json({"service": "crypto_envelope", "ciphers": ["SHA256-CTR", "HMAC-SHA256", "HKDF-RFC5869"], "anti_replay_window": 300.0})
         elif path in ("/", "/index.html"):
             index_path = self.public_dir / "index.html"
             if index_path.exists():
@@ -605,6 +611,15 @@ class BridgeStudioHTTPHandler(SimpleHTTPRequestHandler):
             self._send_json(json.loads(res["content"][0]["text"]))
         elif path == "/api/pulse":
             res = srv.execute_tool("bridge_heartbeat", payload)
+            self._send_json(json.loads(res["content"][0]["text"]))
+        elif path in ("/api/envelope/seal", "/api/envelopes/seal"):
+            res = srv.execute_tool("bridge_seal_envelope", payload)
+            self._send_json(json.loads(res["content"][0]["text"]))
+        elif path in ("/api/envelope/open", "/api/envelopes/open"):
+            res = srv.execute_tool("bridge_open_envelope", payload)
+            self._send_json(json.loads(res["content"][0]["text"]))
+        elif path in ("/api/federation/route", "/api/federation/broadcast"):
+            res = srv.execute_tool("bridge_federate_message", payload)
             self._send_json(json.loads(res["content"][0]["text"]))
         elif path == "/api/mcp":
             rpc_res = srv.handle_request(body)
@@ -1000,11 +1015,41 @@ def handle_test(args: argparse.Namespace) -> int:
         srv = MCPServer()
         diag = srv.execute_tool("bridge_diagnostics", {"verbose": False})
         assert diag["isError"] is False
-        print(f"  {Color.green('✓')} [6/6] System Diagnostics & Environment Inspection")
+        print(f"  {Color.green('✓')} [6/8] System Diagnostics & Environment Inspection")
         tests_passed += 1
     except Exception as e:
-        print(f"  {Color.red('✗')} [6/6] Diagnostics test failed: {e}")
+        print(f"  {Color.red('✗')} [6/8] Diagnostics test failed: {e}")
 
+    # Test 7: Cryptographic Message Envelope
+    try:
+        from .crypto_envelope import EnvelopeSecurityManager
+        em = EnvelopeSecurityManager(agent_id="test-sender")
+        env = em.seal_envelope("test-recipient", {"command": "EXECUTE", "param": 42}, encrypt=True)
+        assert env.is_encrypted is True
+        assert env.mac_hex is not None
+        opened = em.open_envelope(env)
+        assert opened["verified"] is True
+        assert opened["payload"]["command"] == "EXECUTE"
+        print(f"  {Color.green('✓')} [7/8] Cryptographic Message Envelope & Symmetric Ratchet")
+        tests_passed += 1
+    except Exception as e:
+        print(f"  {Color.red('✗')} [7/8] Crypto envelope test failed: {e}")
+
+    # Test 8: Federation Gateway & Mesh Routing
+    try:
+        from .federation_gateway import FederationGateway
+        gw = FederationGateway(bridge_id="bridge-test-1")
+        gw.register_peer("peer-bridge-2", "http://127.0.0.1:8789")
+        bcast = gw.route_outbound("swarm.alert", {"severity": "CRITICAL"})
+        assert bcast["total_dispatched"] == 1
+        topo = gw.get_topology()
+        assert topo["peer_count"] == 1
+        print(f"  {Color.green('✓')} [8/8] Cross-Bridge Federation Gateway & Routing Mesh")
+        tests_passed += 1
+    except Exception as e:
+        print(f"  {Color.red('✗')} [8/8] Federation gateway test failed: {e}")
+
+    total_tests = 8
     print(f"\n{Color.bold('Test Summary:')} {tests_passed}/{total_tests} Tests Passed.")
     return 0 if tests_passed == total_tests else 1
 
@@ -1044,24 +1089,101 @@ def handle_resilience(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_envelope(args: argparse.Namespace) -> int:
+    """Handle message envelope packaging and opening."""
+    from .crypto_envelope import EnvelopeSecurityManager
+    mgr = EnvelopeSecurityManager(agent_id=getattr(args, "agent_id", "agent-cli") or "agent-cli")
+
+    action = getattr(args, "action", "seal")
+    secret = getattr(args, "secret", None)
+
+    if action == "seal":
+        recipient = getattr(args, "recipient", "*") or "*"
+        payload = getattr(args, "payload", "") or ""
+        encrypt = not getattr(args, "no_encrypt", False)
+        env = mgr.seal_envelope(recipient_id=recipient, payload=payload, shared_secret=secret, encrypt=encrypt)
+        if getattr(args, "json", False):
+            print(json.dumps(env.to_dict(), indent=2))
+        else:
+            print(Color.bold(Color.cyan(f"✉️ Sealed Cryptographic Message Envelope ({env.envelope_id})")))
+            print(f"  Sender:      {env.sender_id}")
+            print(f"  Recipient:   {env.recipient_id}")
+            print(f"  Seq No:      {env.seq_no}")
+            print(f"  Encrypted:   {Color.green('YES') if env.is_encrypted else Color.yellow('NO')}")
+            print(f"  HMAC:        {env.mac_hex[:16]}...{env.mac_hex[-8:]}")
+            print(f"  Envelope JSON:\n{env.to_json()}\n")
+        return 0
+    elif action == "open":
+        env_raw = getattr(args, "envelope", None)
+        if not env_raw:
+            print(Color.red("Error: Must specify --envelope JSON string to open."))
+            return 1
+        try:
+            res = mgr.open_envelope(env_raw, shared_secret=secret)
+            if getattr(args, "json", False):
+                print(json.dumps(res, indent=2))
+            else:
+                print(Color.bold(Color.green(f"🔓 Successfully Opened & Verified Envelope ({res['envelope_id']})")))
+                print(f"  Sender:    {res['sender_id']}")
+                print(f"  Seq No:    {res['seq_no']}")
+                print(f"  Verified:  {Color.green('HMAC VALID')}")
+                print(f"  Payload:   {res['payload']}\n")
+            return 0
+        except Exception as e:
+            if getattr(args, "json", False):
+                print(json.dumps({"error": str(e), "verified": False}, indent=2))
+            else:
+                print(Color.red(f"✖ Failed to open envelope: {e}"))
+            return 1
+    return 0
+
+
+def handle_federation(args: argparse.Namespace) -> int:
+    """Handle cross-bridge federation gateway inspection and routing."""
+    from .federation_gateway import FederationGateway
+    gateway = FederationGateway(bridge_id="bridge-cli-node")
+
+    bcast = getattr(args, "broadcast", None)
+    if bcast:
+        topic = getattr(args, "topic", "*") or "*"
+        res = gateway.route_outbound(topic=topic, payload=bcast)
+        if getattr(args, "json", False):
+            print(json.dumps(res, indent=2))
+        else:
+            print(Color.bold(Color.cyan(f"🌐 Broadcasted Federated Message ({res['message_id']}) on topic '{topic}'")))
+        return 0
+
+    topo = gateway.get_topology()
+    if getattr(args, "json", False):
+        print(json.dumps(topo, indent=2))
+    else:
+        print(Color.bold(Color.cyan(f"🌐 Federation Mesh Gateway Topology ({gateway.bridge_id})")))
+        print(f"  Peers Connected: {topo['peer_count']}")
+        print(f"  Active Topics:   {topo['active_topics']}\n")
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Argument Parser & Entry Point
 # ---------------------------------------------------------------------------
 
 def build_parser() -> argparse.ArgumentParser:
     """Construct command-line argument parser."""
+    common_parent = argparse.ArgumentParser(add_help=False)
+    common_parent.add_argument("--no-color", action="store_true", help="Disable ANSI color output.")
+    common_parent.add_argument("--json", action="store_true", help="Output raw JSON data.")
+
     parser = argparse.ArgumentParser(
         prog="sovereign-bridge",
         description="Sovereign Agent Bridge :: Zero-dependency multi-channel messaging, MCP server, consensus engine, and dead-man switch watchdog.",
+        parents=[common_parent],
     )
     parser.add_argument("-v", "--version", action="version", version=f"sovereign-agent-bridge {__version__}")
-    parser.add_argument("--no-color", action="store_true", help="Disable ANSI color output.")
-    parser.add_argument("--json", action="store_true", help="Output raw JSON data.")
 
     subparsers = parser.add_subparsers(dest="subcommand", help="Available subcommands")
 
     # send
-    p_send = subparsers.add_parser("send", help="Send a message to a specific channel.")
+    p_send = subparsers.add_parser("send", parents=[common_parent], help="Send a message to a specific channel.")
     p_send.add_argument("channel", choices=["signal", "simplex", "telegram", "matrix", "webhook", "auto", "local"], help="Channel adapter.")
     p_send.add_argument("message", help="Message text content.")
     p_send.add_argument("-r", "--recipient", help="Recipient ID / number / address.")
@@ -1069,18 +1191,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_send.add_argument("-i", "--agent-id", help="Sender agent ID.")
 
     # broadcast
-    p_bcast = subparsers.add_parser("broadcast", help="Broadcast message across connected channels.")
+    p_bcast = subparsers.add_parser("broadcast", parents=[common_parent], help="Broadcast message across connected channels.")
     p_bcast.add_argument("message", help="Broadcast message content.")
     p_bcast.add_argument("-c", "--channels", help="Comma-separated subset of channels.")
     p_bcast.add_argument("-p", "--priority", default="NORMAL", choices=["LOW", "NORMAL", "HIGH", "CRITICAL"], help="Priority level.")
     p_bcast.add_argument("-i", "--agent-id", help="Broadcaster agent ID.")
 
     # channels
-    p_chan = subparsers.add_parser("channels", help="List channels and query live health status.")
+    p_chan = subparsers.add_parser("channels", parents=[common_parent], help="List channels and query live health status.")
     p_chan.add_argument("-t", "--test", action="store_true", help="Perform live latency ping check.")
 
     # claim
-    p_claim = subparsers.add_parser("claim", help="Claim or release a project lock.")
+    p_claim = subparsers.add_parser("claim", parents=[common_parent], help="Claim or release a project lock.")
     p_claim.add_argument("project_id", nargs="?", default="default-project", help="Project / lock ID.")
     p_claim.add_argument("-a", "--agent-id", help="Requesting agent ID.")
     p_claim.add_argument("--release", action="store_true", help="Release held lock.")
@@ -1090,7 +1212,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_claim.add_argument("--list", action="store_true", help="List all active locks.")
 
     # consensus
-    p_cons = subparsers.add_parser("consensus", help="Run 3-way dialectic consensus.")
+    p_cons = subparsers.add_parser("consensus", parents=[common_parent], help="Run 3-way dialectic consensus.")
     p_cons.add_argument("proposal", help="Proposal or thesis to evaluate.")
     p_cons.add_argument("--proponent", default="Proponent-Agent", help="Proponent agent role.")
     p_cons.add_argument("--skeptic", default="Skeptic-Agent", help="Skeptic agent role.")
@@ -1099,7 +1221,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_cons.add_argument("--rounds", type=int, default=3, help="Deliberation rounds.")
 
     # pulse
-    p_pulse = subparsers.add_parser("pulse", help="Record agent heartbeat pulse.")
+    p_pulse = subparsers.add_parser("pulse", parents=[common_parent], help="Record agent heartbeat pulse.")
     p_pulse.add_argument("agent_id", nargs="?", default="agent-cli", help="Agent identifier.")
     p_pulse.add_argument("--interval", type=float, default=60.0, help="Pulse interval in seconds.")
     p_pulse.add_argument("--timeout", type=float, help="Dead-man switch timeout in seconds.")
@@ -1108,33 +1230,49 @@ def build_parser() -> argparse.ArgumentParser:
     p_pulse.add_argument("--list", action="store_true", help="List all active pulses.")
 
     # watchdog
-    p_watch = subparsers.add_parser("watchdog", help="Start continuous heartbeat watchdog daemon.")
+    p_watch = subparsers.add_parser("watchdog", parents=[common_parent], help="Start continuous heartbeat watchdog daemon.")
     p_watch.add_argument("--interval", type=float, default=5.0, help="Scan interval in seconds.")
     p_watch.add_argument("--storage", help="Path to heartbeats.json file.")
     p_watch.add_argument("--alerts-log", help="Path to watchdog_alerts.jsonl.")
     p_watch.add_argument("--webhook", help="Webhook URL for dead-man alerts.")
 
     # serve
-    p_serve = subparsers.add_parser("serve", help="Launch Bridge Studio Web UI (design influenced by Material 3).")
+    p_serve = subparsers.add_parser("serve", parents=[common_parent], help="Launch Bridge Studio Web UI (design influenced by Material 3).")
     p_serve.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1).")
     p_serve.add_argument("-p", "--port", type=int, default=8788, help="Port to bind (default: 8788).")
     p_serve.add_argument("--public-dir", help="Path to static web assets directory.")
 
     # resilience / circuits
     for res_alias in ("resilience", "circuits"):
-        p_res = subparsers.add_parser(res_alias, help="Inspect adaptive circuit breakers and anti-replay metrics.")
+        p_res = subparsers.add_parser(res_alias, parents=[common_parent], help="Inspect adaptive circuit breakers and anti-replay metrics.")
         p_res.add_argument("--reset", help="Reset specific channel circuit breaker.")
 
     # mcp
-    subparsers.add_parser("mcp", help="Run Model Context Protocol (MCP) server on stdio.")
+    subparsers.add_parser("mcp", parents=[common_parent], help="Run Model Context Protocol (MCP) server on stdio.")
+
+    # envelope
+    p_env = subparsers.add_parser("envelope", parents=[common_parent], help="Cryptographic message envelope sealing and opening.")
+    p_env.add_argument("action", choices=["seal", "open"], help="Action: seal or open.")
+    p_env.add_argument("-r", "--recipient", default="*", help="Recipient agent ID (seal).")
+    p_env.add_argument("-p", "--payload", default="", help="Message payload string or JSON (seal).")
+    p_env.add_argument("-e", "--envelope", help="Raw envelope JSON string to open.")
+    p_env.add_argument("-s", "--secret", help="Optional pre-shared key for encryption/MAC.")
+    p_env.add_argument("-i", "--agent-id", default="agent-cli", help="Agent identifier.")
+    p_env.add_argument("--no-encrypt", action="store_true", help="Do not encrypt payload (authenticated plaintext).")
+
+    # federation
+    p_fed = subparsers.add_parser("federation", parents=[common_parent], help="Cross-bridge federation gateway and mesh topology.")
+    p_fed.add_argument("-b", "--broadcast", help="Federated message payload to broadcast across bridges.")
+    p_fed.add_argument("-t", "--topic", default="*", help="Topic filter for federation broadcast.")
+    p_fed.add_argument("--topology", action="store_true", help="Display federation topology.")
 
     # diagnostics / doctor / platform
-    subparsers.add_parser("diagnostics", help="Run system diagnostics.")
-    subparsers.add_parser("doctor", help="Alias for diagnostics.")
-    subparsers.add_parser("platform", help="Alias for diagnostics.")
+    subparsers.add_parser("diagnostics", parents=[common_parent], help="Run system diagnostics.")
+    subparsers.add_parser("doctor", parents=[common_parent], help="Alias for diagnostics.")
+    subparsers.add_parser("platform", parents=[common_parent], help="Alias for diagnostics.")
 
     # test
-    subparsers.add_parser("test", help="Execute internal self-verification tests.")
+    subparsers.add_parser("test", parents=[common_parent], help="Execute internal self-verification tests.")
 
     return parser
 
@@ -1172,6 +1310,10 @@ def main() -> int:
         return handle_watchdog(args)
     elif args.subcommand in ("resilience", "circuits"):
         return handle_resilience(args)
+    elif args.subcommand == "envelope":
+        return handle_envelope(args)
+    elif args.subcommand == "federation":
+        return handle_federation(args)
     elif args.subcommand == "serve":
         return handle_serve(args)
     elif args.subcommand == "mcp":

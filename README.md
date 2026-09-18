@@ -259,8 +259,45 @@ Add the Sovereign Agent Bridge MCP server to your **Claude Desktop** or **Antigr
 - `bridge_claim_project`: Acquire, renew, release, or inspect project mutex locks.
 - `bridge_consensus`: Run multi-agent 3-way dialectic consensus deliberation.
 - `bridge_watchdog_pulse`: Record agent heartbeat pulses and query status.
+- `bridge_seal_envelope`: Package, authenticate, and encrypt payloads into cryptographic message envelopes.
+- `bridge_open_envelope`: Authenticate HMAC signature, verify sequence monotonicity, and decrypt envelopes.
+- `bridge_federation_topology`: Inspect connected federation bridge peers and routing mesh topology.
+- `bridge_federate_message`: Route messages across peer bridge gateways with loop defense.
 - `bridge_stats`: Retrieve system throughput telemetry and metrics.
 - `bridge_diagnostics`: Run comprehensive hardware and network diagnostic checks.
+
+---
+
+## 🔐 Cryptographic Message Envelope & Federation Mesh (Round 4)
+
+### 1. Authenticated Cryptographic Envelope
+Tamper-proof, authenticated, and encrypted agent-to-agent communication over untrusted relays, channels, and peer networks:
+- **RFC 5869 HKDF**: Pseudo-random key extraction and expansion for clean key separation (`enc_key`, `mac_key`).
+- **SHA-256 CTR Cipher**: Zero-dependency cross-platform keystream encryption.
+- **HMAC-SHA256 Integrity**: Full envelope header and ciphertext authenticity verification.
+- **Replay Protection**: Monotonic sequence counters and sliding timestamp replay windows.
+
+```bash
+# Seal an encrypted message envelope for an agent
+sovereign-bridge envelope seal -r agent-bob -p '{"directive": "SCALE_UP", "replicas": 4}'
+
+# Open and verify a received envelope
+sovereign-bridge envelope open -e '{"envelope_id": "...", ...}'
+```
+
+### 2. Cross-Bridge Federation Gateway
+Interconnect autonomous agent swarms across cloud VPCs, local networks, and edge nodes:
+- **Mesh Peering**: Dynamic bridge discovery and topic-based message routing (`metrics.#`, `alerts.*`).
+- **Loop Prevention**: Distributed vector tracing (`visited_bridges`) drops cyclic message loops immediately.
+- **TTL Hop Constraints**: Configurable hop bounds prevent infinite forwarding in mesh networks.
+
+```bash
+# Inspect federation topology and active peer bridges
+sovereign-bridge federation --topology
+
+# Broadcast a federated message across peer bridges
+sovereign-bridge federation -b '{"alert": "NODE_UNRESPONSIVE"}' -t alerts.security
+```
 
 ---
 

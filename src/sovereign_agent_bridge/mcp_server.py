@@ -253,6 +253,10 @@ class MCPServer:
         self._messages_sent_count = 0
         self._broadcasts_count = 0
         self._consensus_runs_count = 0
+        from .crypto_envelope import EnvelopeSecurityManager
+        from .federation_gateway import FederationGateway
+        self.envelope_mgr = EnvelopeSecurityManager(agent_id="bridge-agent-local")
+        self.federation_gateway = FederationGateway(bridge_id="bridge-local-node")
         self._tools_cache = self._build_tools_manifest()
 
     # -----------------------------------------------------------------------
@@ -519,6 +523,94 @@ class MCPServer:
                     },
                 },
             },
+            {
+                "name": "bridge_seal_envelope",
+                "description": "Package, sign, and optionally encrypt an agent message into a tamper-proof cryptographic envelope.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "recipient_id": {
+                            "type": "string",
+                            "description": "Target agent recipient identifier.",
+                        },
+                        "payload": {
+                            "description": "Message string or JSON object payload.",
+                        },
+                        "encrypt": {
+                            "type": "boolean",
+                            "description": "Whether to encrypt the payload via SHA256-CTR (default: true).",
+                            "default": True,
+                        },
+                        "shared_secret": {
+                            "type": "string",
+                            "description": "Optional custom pre-shared secret for key derivation.",
+                        },
+                        "key_id": {
+                            "type": "string",
+                            "description": "Key ID identifier label (default: psk-v1).",
+                            "default": "psk-v1",
+                        },
+                    },
+                    "required": ["recipient_id", "payload"],
+                },
+            },
+            {
+                "name": "bridge_open_envelope",
+                "description": "Verify HMAC integrity, enforce sequence order, and decrypt a cryptographic message envelope.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "envelope": {
+                            "description": "Message envelope dictionary or JSON string.",
+                        },
+                        "shared_secret": {
+                            "type": "string",
+                            "description": "Pre-shared key matching the sealed envelope.",
+                        },
+                        "max_age_ms": {
+                            "type": "integer",
+                            "description": "Maximum age in milliseconds before replay rejection (default: 300000).",
+                            "default": 300000,
+                        },
+                    },
+                    "required": ["envelope"],
+                },
+            },
+            {
+                "name": "bridge_federation_topology",
+                "description": "Query the cross-bridge federation mesh topology, connected peers, and message routing statistics.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                },
+            },
+            {
+                "name": "bridge_federate_message",
+                "description": "Broadcast or route an agent message across federated bridge clusters with loop prevention and TTL constraints.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "topic": {
+                            "type": "string",
+                            "description": "Federation topic name (e.g. 'swarm.consensus', 'agent.discovery').",
+                        },
+                        "payload": {
+                            "description": "Arbitrary message payload or document.",
+                        },
+                        "target_peers": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Optional list of target peer bridge IDs.",
+                        },
+                        "max_hops": {
+                            "type": "integer",
+                            "description": "Maximum hop count constraint (default: 3).",
+                            "default": 3,
+                        },
+                    },
+                    "required": ["topic", "payload"],
+                },
+            },
         ]
 
     # -----------------------------------------------------------------------
@@ -548,6 +640,14 @@ class MCPServer:
                 return self._tool_diagnostics(arguments)
             elif name == "bridge_fault_tolerance_metrics":
                 return self._tool_fault_tolerance_metrics(arguments)
+            elif name == "bridge_seal_envelope":
+                return self._tool_seal_envelope(arguments)
+            elif name == "bridge_open_envelope":
+                return self._tool_open_envelope(arguments)
+            elif name == "bridge_federation_topology":
+                return self._tool_federation_topology(arguments)
+            elif name == "bridge_federate_message":
+                return self._tool_federate_message(arguments)
             else:
                 raise ValueError(f"Unknown tool: '{name}'")
         except Exception as e:
@@ -937,6 +1037,65 @@ class MCPServer:
         }
         return {
             "content": [{"type": "text", "text": json.dumps(result, indent=2)}],
+            "isError": False,
+        }
+
+    def _tool_seal_envelope(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        recipient_id = str(args.get("recipient_id", "*"))
+        payload = args.get("payload", "")
+        shared_secret = args.get("shared_secret")
+        encrypt = bool(args.get("encrypt", True))
+        key_id = str(args.get("key_id", "psk-v1"))
+        metadata = args.get("metadata")
+        env = self.envelope_mgr.seal_envelope(
+            recipient_id=recipient_id,
+            payload=payload,
+            shared_secret=shared_secret,
+            encrypt=encrypt,
+            key_id=key_id,
+            metadata=metadata,
+        )
+        return {
+            "content": [{"type": "text", "text": json.dumps(env.to_dict(), indent=2)}],
+            "isError": False,
+        }
+
+    def _tool_open_envelope(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        envelope_data = args.get("envelope")
+        if not envelope_data:
+            raise ValueError("Missing parameter 'envelope'")
+        shared_secret = args.get("shared_secret")
+        max_age_ms = int(args.get("max_age_ms", 300_000))
+        res = self.envelope_mgr.open_envelope(
+            envelope_data,
+            shared_secret=shared_secret,
+            max_age_ms=max_age_ms,
+        )
+        return {
+            "content": [{"type": "text", "text": json.dumps(res, indent=2)}],
+            "isError": False,
+        }
+
+    def _tool_federation_topology(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        topo = self.federation_gateway.get_topology()
+        return {
+            "content": [{"type": "text", "text": json.dumps(topo, indent=2)}],
+            "isError": False,
+        }
+
+    def _tool_federate_message(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        topic = str(args.get("topic", "*"))
+        payload = args.get("payload", "")
+        target_peers = args.get("target_peers")
+        max_hops = int(args.get("max_hops", 3))
+        res = self.federation_gateway.route_outbound(
+            topic=topic,
+            payload=payload,
+            target_peers=target_peers,
+            max_hops=max_hops,
+        )
+        return {
+            "content": [{"type": "text", "text": json.dumps(res, indent=2)}],
             "isError": False,
         }
 

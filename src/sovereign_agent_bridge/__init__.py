@@ -281,6 +281,27 @@ try:
 except ImportError:
     pass
 
+try:
+    from .crypto_envelope import (
+        MessageEnvelope,
+        EnvelopeSecurityManager,
+        hkdf_extract,
+        hkdf_expand,
+        derive_keys,
+        sha256_ctr_crypt,
+    )
+except ImportError:
+    pass
+
+try:
+    from .federation_gateway import (
+        BridgePeer,
+        FederatedMessage,
+        FederationGateway,
+    )
+except ImportError:
+    pass
+
 __all__ = [
     "__version__",
     "__author__",
@@ -317,4 +338,13 @@ __all__ = [
     "get_circuit_registry",
     "get_anti_replay_guard",
     "execute_resilient_channel_dispatch",
+    "MessageEnvelope",
+    "EnvelopeSecurityManager",
+    "hkdf_extract",
+    "hkdf_expand",
+    "derive_keys",
+    "sha256_ctr_crypt",
+    "BridgePeer",
+    "FederatedMessage",
+    "FederationGateway",
 ]

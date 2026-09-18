@@ -464,6 +464,25 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             })
             return
 
+        # 8c. Cryptographic Envelope Information
+        if path in ("/api/envelope", "/api/envelopes"):
+            self._send_json_response({
+                "service": "crypto_envelope",
+                "ciphers": ["SHA256-CTR", "HMAC-SHA256", "HKDF-RFC5869"],
+                "anti_replay_window": 300.0,
+            })
+            return
+
+        # 8d. Federation Topology
+        if path in ("/api/federation", "/api/federation/topology"):
+            from .federation_gateway import FederationGateway
+            gw = getattr(self.ui_server, "federation_gateway", None)
+            if gw is None:
+                gw = FederationGateway(bridge_id="bridge-ui-node")
+                self.ui_server.federation_gateway = gw
+            self._send_json_response(gw.get_topology())
+            return
+
         # 9. Static file serving or fallback to Embedded HTML Studio
         self._handle_static_or_fallback(path)
 
@@ -502,6 +521,56 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             if chan:
                 get_circuit_registry().get_or_create(chan).reset()
             self._send_json_response({"status": "reset", "channel": chan})
+        elif path in ("/api/envelope/seal", "/api/envelopes/seal"):
+            from .crypto_envelope import EnvelopeSecurityManager
+            em = getattr(self.ui_server, "envelope_mgr", None)
+            if em is None:
+                em = EnvelopeSecurityManager(agent_id=body.get("agent_id", "ui-agent"))
+                self.ui_server.envelope_mgr = em
+            env = em.seal_envelope(
+                recipient_id=body.get("recipient_id", "*"),
+                payload=body.get("payload", ""),
+                shared_secret=body.get("shared_secret"),
+                encrypt=body.get("encrypt", True),
+            )
+            self._send_json_response({"success": True, "envelope": env.to_dict()})
+        elif path in ("/api/envelope/open", "/api/envelopes/open"):
+            from .crypto_envelope import EnvelopeSecurityManager
+            em = getattr(self.ui_server, "envelope_mgr", None)
+            if em is None:
+                em = EnvelopeSecurityManager(agent_id=body.get("agent_id", "ui-agent"))
+                self.ui_server.envelope_mgr = em
+            try:
+                res = em.open_envelope(body.get("envelope"), shared_secret=body.get("shared_secret"))
+                self._send_json_response({"success": True, "opened": res})
+            except Exception as e:
+                self._send_error_json(str(e), status_code=400)
+        elif path in ("/api/federation/route", "/api/federation/broadcast"):
+            from .federation_gateway import FederationGateway
+            gw = getattr(self.ui_server, "federation_gateway", None)
+            if gw is None:
+                gw = FederationGateway(bridge_id="bridge-ui-node")
+                self.ui_server.federation_gateway = gw
+            res = gw.route_outbound(
+                topic=body.get("topic", "*"),
+                payload=body.get("payload", {}),
+                max_hops=body.get("max_hops", body.get("ttl_hops", 3)),
+            )
+            self._send_json_response({"success": True, "result": res})
+        elif path == "/api/federation/peers":
+            from .federation_gateway import FederationGateway
+            gw = getattr(self.ui_server, "federation_gateway", None)
+            if gw is None:
+                gw = FederationGateway(bridge_id="bridge-ui-node")
+                self.ui_server.federation_gateway = gw
+            peer_id = body.get("peer_id") or body.get("bridge_id", "")
+            topics = body.get("topics") or body.get("federated_topics")
+            peer = gw.register_peer(
+                peer_id=peer_id,
+                endpoint_url=body.get("endpoint_url", ""),
+                federated_topics=topics,
+            )
+            self._send_json_response({"success": True, "peer": peer.to_dict()})
         elif path == "/api/events/publish":
             event_type = body.get("type", "custom_event")
             data = body.get("data", {})
@@ -956,6 +1025,8 @@ class BridgeUIServer:
         claim_manager: Optional[Any] = None,
         watchdog: Optional[Any] = None,
         static_dir: Optional[Union[str, Path]] = None,
+        envelope_manager: Optional[Any] = None,
+        federation_gateway: Optional[Any] = None,
     ) -> None:
         self.host = host
         self.port = port
@@ -963,6 +1034,8 @@ class BridgeUIServer:
         self.consensus_engine = consensus_engine
         self.claim_manager = claim_manager
         self.watchdog = watchdog
+        self.envelope_mgr = envelope_manager
+        self.federation_gateway = federation_gateway
 
         # Resolve static directory
         if static_dir:
