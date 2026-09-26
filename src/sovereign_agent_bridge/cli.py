@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Sovereign Agent Bridge - Command Line Interface (CLI) & Runtime Engine.
 
