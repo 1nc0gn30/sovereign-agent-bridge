@@ -123,7 +123,7 @@ sovereign-bridge diagnostics
 sovereign-bridge channels --test
 
 # Dispatch a message to a specific channel
-sovereign-bridge send signal "Autonomous sync verified." -r "+15551234567"
+sovereign-bridge send signal "Autonomous sync verified." -r "+19482047987"
 
 # Broadcast a critical alert across all active channels
 sovereign-bridge broadcast "Database failover complete." -p CRITICAL
@@ -156,7 +156,7 @@ Requires a running `signal-cli` REST daemon or CLI instance.
 
 ```json
 {
-  "account": "+15550192834",
+  "account": "+19482047987",
   "endpoint": "http://127.0.0.1:8080",
   "mode": "rest",
   "timeout": 15.0
