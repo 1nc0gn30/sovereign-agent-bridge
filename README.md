@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="assets/hero-banner.svg" alt="Sovereign Agent Bridge — Sovereign Architecture Banner" width="100%" />
+</div>
+
+<br />
+
 # 🏛️ Sovereign Agent Bridge
 
 > ⚡ **Live Web Application**: [https://sovereign-agent-bridge.netlify.app](https://sovereign-agent-bridge.netlify.app)  
