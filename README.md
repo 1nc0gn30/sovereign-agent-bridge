@@ -4,13 +4,12 @@
 
 <br />
 
-# 🏛️ Sovereign Agent Bridge
+# 🏛️ Sovereign Agent Signal Bridge
 
-> ⚡ **Live Web Application**: [https://sovereign-agent-bridge.netlify.app](https://sovereign-agent-bridge.netlify.app)  
-> 💳 **Unlock Pro Lifetime License ($19 One-Time, $0/mo)**: **[Instant Pro Unlock via Stripe](https://buy.stripe.com/4gMfZg9AheOsdhKbcAfw40L)** *(Use promo code `FOUNDER25` for 25% off)*  
-> 🏆 **All-Access Sovereign Pro Bundle (All 44 Tools — $49 Lifetime)**: **[Get All 44 Studios via Stripe](https://buy.stripe.com/eVq14m5k16hW4Le0xWfw40M)**
+> ⚡ **Live Web Application**: [https://sovereign-agent-bridge.netlify.app](https://sovereign-agent-bridge.netlify.app) • **Local Port**: `http://127.0.0.1:8102`  
+> ☕ **100% Free & Open-Access Architecture (Zero Paywalls)**: Supported via **[Buy Us a Coffee (Stripe)](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)** & **Solana Tip Address** (`GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`).
 
-> **Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, 3-Way Dialectic Consensus, Distributed Claim Locks, Dead-Man Watchdogs, Bridge Studio UI (design influenced by Material 3), and Model Context Protocol (MCP) support.**
+> **Zero-dependency sovereign multi-agent communication bridge with Signal (Double Ratchet), SimpleX (SMP onion relay), Telegram, Matrix, 3-Way Dialectic Consensus, Distributed Claim Locks, Dead-Man Watchdogs, Bridge Studio UI (design influenced by Material 3), and Model Context Protocol (MCP) support.**
 
 [![CI](https://github.com/sovereign-agent-bridge/sovereign-agent-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/sovereign-agent-bridge/sovereign-agent-bridge/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
@@ -324,6 +323,39 @@ Open **`http://127.0.0.1:8765`** in your browser.
 - **Interactive Multi-Channel Dispatcher**: Send test messages or broadcast alerts with real-time delivery receipts.
 - **Consensus Simulator**: Visual 3-way Proponent, Skeptic, and Arbitrator deliberation deck.
 - **Claims Board & Watchdog Countdown**: Live lease status and dead-man switch countdown dials.
+
+---
+
+## 💻 ZothOS CLI & MCP Commands
+
+`sovereign-agent-bridge` is pre-installed in **ZothOS** as a system-wide executable (`sovereign-agent-bridge` in `/usr/local/bin/` and `~/.local/bin/`).
+
+```bash
+# Check version and channel status
+sovereign-agent-bridge --version
+sovereign-agent-bridge --status
+
+# Run diagnostics and verify cryptographic envelopes
+sovereign-agent-bridge diagnostics --json
+
+# Send a signed message via Signal or SimpleX
+sovereign-agent-bridge send --channel signal --to "+19482047987" --msg "System online" --json
+
+# Record agent heartbeat pulse
+sovereign-agent-bridge pulse --agent-id agent-01 --interval 30
+
+# Launch Bridge Studio Web UI on port 8102
+sovereign-agent-bridge serve
+```
+
+---
+
+## ☕ 100% Free & Open-Access Architecture (Zero Paywalls)
+
+All tools, channels, consensus engines, and MCP protocols are **100% free and unlocked by default**.
+
+- **Buy Us a Coffee (Stripe)**: [https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
+- **Solana Tip Address**: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK` (`solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`)
 
 ---
 
