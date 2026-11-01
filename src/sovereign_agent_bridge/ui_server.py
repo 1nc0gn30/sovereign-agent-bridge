@@ -30,6 +30,17 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple, Un
 logger = logging.getLogger("sovereign_agent_bridge.ui_server")
 
 
+def _safe_rel(raw: str) -> str:
+    """Request path -> safe relative path inside a static dir; '' (index) if it
+    tries to climb out with '..' or is absolute. Raw request paths are not normalised."""
+    from urllib.parse import unquote
+    rel = unquote(str(raw or "")).replace("\\", "/").lstrip("/")
+    parts = [p for p in rel.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in parts) or ":" in (parts[0] if parts else ""):
+        return ""
+    return "/".join(parts)
+
+
 # ---------------------------------------------------------------------------
 # In-Memory Event Broker for Server-Sent Events (SSE)
 # ---------------------------------------------------------------------------

@@ -774,7 +774,7 @@ class MCPServer:
                         headers={"Content-Type": "application/json"},
                     )
                     with urllib.request.urlopen(req, timeout=5.0) as resp:
-                        routed.append("simplex:@neal")
+                        routed.append("simplex:@1nc0gn30")
                 except Exception:
                     pass
             return {
@@ -943,7 +943,7 @@ class MCPServer:
                 "encryption": "Olm / Megolm E2EE + SimpleX SMP Bridge Relay",
                 "status": "HEALTHY" if simplex_live else "ONLINE",
                 "configured": True,
-                "relay_target": f"simplex:@{known_contacts[0]}" if known_contacts else "simplex:@neal",
+                "relay_target": f"simplex:@{known_contacts[0]}" if known_contacts else "simplex:@1nc0gn30",
                 "homeserver": os.environ.get("MATRIX_HOMESERVER", "http://127.0.0.1:8102"),
                 "latency_ms": 21.4 if test_health else None,
                 "features": ["text", "attachments", "room_federation", "simplex_cross_relay"],
