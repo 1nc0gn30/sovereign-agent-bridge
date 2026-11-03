@@ -139,12 +139,17 @@ def print_banner(no_banner: bool = False) -> None:
     """Print ASCII Art Header."""
     if no_banner:
         return
+    b1 = Color.cyan(r"   _____  ____  _      __ ______ ____   ______ _____  _   __ ")
+    b2 = Color.cyan(r"  / ___/ / __ \| | /| / // ____// __ \ / ____//  _/ / | / / ")
+    b3 = Color.cyan(r"  \__ \ / / / /| |/ |/ // __/  / /_/ // __/   / /  /  |/ /  ")
+    b4 = Color.cyan(r" ___/ // /_/ / | /| / // /___ / _, _// /___ _/ /  / /|  /   ")
+    b5 = Color.cyan(r"/____/ \____/  |/_/|/_//_____//_/ |_|/_____//___/ /_/ |_/    ")
     banner = f"""
-{Color.cyan("   _____  ____  _      __ ______ ____   ______ _____  _   __ ")}
-{Color.cyan("  / ___/ / __ \\| | /| / // ____// __ \\ / ____//  _/ / | / / ")}
-{Color.cyan("  \\__ \\ / / / /| |/ |/ // __/  / /_/ // __/   / /  /  |/ /  ")}
-{Color.cyan(" ___/ // /_/ / | /| / // /___ / _, _// /___ _/ /  / /|  /   ")}
-{Color.cyan("/____/ \\____/  |/_/|/_//_____//_/ |_|/_____//___/ /_/ |_/    ")}
+{b1}
+{b2}
+{b3}
+{b4}
+{b5}
 {Color.bold("AGENT BRIDGE")} {Color.dim("v" + __version__)} {Color.yellow("::")} {Color.magenta("SOVEREIGN MULTI-CHANNEL RUNTIME")}
 """
     print(banner)
