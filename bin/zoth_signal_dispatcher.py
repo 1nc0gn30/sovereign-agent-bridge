@@ -34,10 +34,10 @@ from typing import Any, Dict, List, Optional, Tuple
 # Base paths & logging
 PHONE_NUMBER = os.environ.get("SIGNAL_ACCOUNT", "+19482047987")
 SOCKET_PATH = os.environ.get("SIGNAL_SOCKET_PATH", "/tmp/signal-cli.sock")
-AGY_BIN = shutil.which("agy") or "/home/zoth/.local/bin/agy"
-AZOTH_DIR = Path("/home/zoth/NullAITech/azoth-local-agent")
-WORKSPACE_DIR = Path("/home/zoth")
-LOG_PATH = Path("/home/zoth/.local/state/zoth-signal-dispatcher.log")
+AGY_BIN = shutil.which("agy") or "~/.local/bin/agy"
+AZOTH_DIR = Path("~/NullAITech/azoth-local-agent")
+WORKSPACE_DIR = Path("~")
+LOG_PATH = Path("~/.local/state/zoth-signal-dispatcher.log")
 LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 MAX_CHUNK_SIZE = 3500
@@ -471,8 +471,8 @@ def create_live_call_link(channel: str = "signal", voice: str = "azoth") -> Tupl
 def generate_voice_audio_file(text: str, voice_name: str = "azoth") -> Optional[str]:
     """Synthesize speech file using agent_voice_call.tts_bridge."""
     try:
-        if "/home/zoth/NullAITech/agent-voice-call/src" not in sys.path:
-            sys.path.insert(0, "/home/zoth/NullAITech/agent-voice-call/src")
+        if "~/NullAITech/agent-voice-call/src" not in sys.path:
+            sys.path.insert(0, "~/NullAITech/agent-voice-call/src")
         from agent_voice_call.tts_bridge import generate_voice_file
         return generate_voice_file(text, voice_name=voice_name, out_format="ogg")
     except Exception as e:
@@ -764,7 +764,7 @@ def run_heartbeat_loop(client: SignalRpcClient) -> None:
         init_ping = (
             "💓 [Zoth Sovereign Bridge Online]\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"• Host: zoth-pill (Parrot OS / Debian)\n"
+            f"• Host: zothos (Parrot OS / Debian)\n"
             f"• Account: {PHONE_NUMBER}\n"
             f"• Status: 🟢 ACTIVE & LISTENING\n"
             f"• Direct Shell: Enabled ($ <cmd> or /cmd <cmd>)\n"
