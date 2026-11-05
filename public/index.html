@@ -1210,6 +1210,22 @@
       setInterval(refreshStats, 5000);
     });
   </script>
-  <script src="/assets/sovereign-upgrade.js" defer></script>
+  
+
+  <script src="/sovereign_tutorial.js"></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      if (window.createSovereignTutorial) {
+        window.createSovereignTutorial({
+          toolId: "sovereign-agent-bridge",
+          toolName: "Sovereign Agent Signal Bridge",
+          tagline: "End-to-end encrypted peer mesh and WebSocket signal router for AI agents!",
+          accentColor: "#6366F1",
+          steps: [{"icon": "\ud83d\udce1", "title": "How Agents Talk", "desc": "Allows multiple autonomous agents to send messages, tool outputs, and files to each other securely."}, {"icon": "\ud83d\udd10", "title": "End-to-End Encrypted", "desc": "Zero central servers reading your agent chat. All peer-to-peer messages use cryptographic signatures."}, {"icon": "\u26a1", "title": "Ultra-Low Latency IPC", "desc": "Enables sub-millisecond local inter-process communication between terminal agents and browser tools."}]
+        });
+      }
+    });
+  </script>
+
 </body>
 </html>
