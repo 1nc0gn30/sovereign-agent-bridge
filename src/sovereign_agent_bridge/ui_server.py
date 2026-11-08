@@ -506,6 +506,14 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             self._send_json_response({"messages": list_bus_messages(limit=limit, recipient=recipient)})
             return
 
+        if path in ("/api/agents/policies", "/api/agents/gatekeep"):
+            from .agent_introspector import get_tool_policies, list_tool_leases
+            self._send_json_response({
+                "policies": get_tool_policies(),
+                "leases": list_tool_leases(limit=25),
+            })
+            return
+
         # 9. Static file serving or fallback to Embedded HTML Studio
         self._handle_static_or_fallback(path)
 
@@ -626,6 +634,44 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             snap = get_live_agent_mesh_snapshot()
             self.ui_server.publish_event("agent_mesh_synced", snap["summary"])
             self._send_json_response({"status": "ok", "snapshot": snap})
+        elif path in ("/api/agents/authorize", "/api/agents/gatekeep"):
+            from .agent_introspector import authorize_tool_execution
+            tool_name = str(body.get("tool_name") or body.get("tool") or "").strip()
+            if not tool_name:
+                self._send_error_json("'tool_name' is required", status_code=400)
+                return
+            res = authorize_tool_execution(
+                tool_name=tool_name,
+                pid=int(body.get("pid") or 0),
+                workspace=str(body.get("workspace") or ""),
+                args_text=str(body.get("args_text") or body.get("args") or ""),
+            )
+            self.ui_server.publish_event(
+                "agent_tool_authorized" if res.get("authorized") else "agent_tool_denied",
+                res,
+            )
+            self._send_json_response(res, status_code=200 if res.get("authorized") else 403)
+        elif path == "/api/agents/release":
+            from .agent_introspector import release_tool_lease
+            lease_id = str(body.get("lease_id") or "").strip()
+            res = release_tool_lease(lease_id=lease_id, exit_code=int(body.get("exit_code") or 0))
+            self.ui_server.publish_event("agent_tool_released", res)
+            self._send_json_response(res)
+        elif path == "/api/agents/policy":
+            from .agent_introspector import set_tool_policy
+            tool_name = str(body.get("tool_name") or body.get("tool") or "").strip()
+            if not tool_name:
+                self._send_error_json("'tool_name' is required", status_code=400)
+                return
+            enabled = body.get("enabled")
+            req_bridge = body.get("require_bridge")
+            updated = set_tool_policy(
+                tool_name=tool_name,
+                enabled=bool(enabled) if enabled is not None else None,
+                require_bridge=bool(req_bridge) if req_bridge is not None else None,
+            )
+            self.ui_server.publish_event("gatekeeper_policy_updated", updated)
+            self._send_json_response({"status": "ok", "policy": updated})
         else:
             self._send_error_json(f"Unknown POST endpoint: {path}", status_code=404)
 

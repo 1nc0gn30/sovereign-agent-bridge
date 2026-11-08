@@ -1230,6 +1230,155 @@ def handle_handoff(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_policy(args: argparse.Namespace) -> int:
+    """Inspect or update Sovereign Bridge AI Tool Gatekeeper policies."""
+    from .agent_introspector import get_tool_policies, set_tool_policy, list_tool_leases
+    if getattr(args, "enable", None):
+        updated = set_tool_policy(args.enable, enabled=True)
+        if getattr(args, "json", False):
+            print(json.dumps(updated, indent=2))
+        else:
+            print(Color.bold(Color.green(f"✓ Enabled AI tool '{updated['tool_name']}' on Sovereign Agent Bridge Gatekeeper.")))
+        return 0
+    if getattr(args, "disable", None):
+        updated = set_tool_policy(args.disable, enabled=False)
+        if getattr(args, "json", False):
+            print(json.dumps(updated, indent=2))
+        else:
+            print(Color.bold(Color.red(f"🔒 Locked AI tool '{updated['tool_name']}' on Sovereign Agent Bridge Gatekeeper (execution blocked).")))
+        return 0
+
+    policies = get_tool_policies()
+    leases = list_tool_leases(limit=15)
+    if getattr(args, "json", False):
+        print(json.dumps({"policies": policies, "leases": leases}, indent=2))
+        return 0
+
+    print(Color.bold(Color.cyan("🛡️  SOVEREIGN BRIDGE AI TOOL GATEKEEPER POLICIES (Mandatory Bridge Connection)")))
+    for p in policies:
+        state_str = Color.green("ALLOWED (VIA BRIDGE)") if p["enabled"] else Color.red("LOCKED (DENIED)")
+        print(
+            f"  • {Color.bold(p['tool_name'].ljust(10))} [{state_str}] — {p['display_name']} "
+            f"(Runs: {p['total_runs']}, Denied: {p['denied_runs']}, Target: {p['binary_target']})"
+        )
+    if leases:
+        print(Color.bold(Color.cyan("\n  Recent Gatekeeper Execution Leases:")))
+        for l in leases[:8]:
+            print(f"    [{l['lease_id']}] {l['tool_name']} (PID {l['pid']}) — {l['status']} ({l['created_ago_sec']}s ago) :: {l['args_text']}")
+    return 0
+
+
+def handle_gatekeep(args: argparse.Namespace) -> int:
+    """Authorize and execute an AI tool strictly through the Sovereign Agent Bridge (:8102)."""
+    import subprocess
+    import urllib.request
+    import urllib.error
+    tool_name = args.tool.strip().lower()
+    bridge_url = os.environ.get("ZOTH_BRIDGE_URL", "http://127.0.0.1:8102").rstrip("/")
+    raw_args = list(getattr(args, "tool_args", []) or [])
+    check_only = bool(getattr(args, "check_only", False))
+    target_bin = getattr(args, "target", None)
+
+    tool_args: List[str] = []
+    idx = 0
+    while idx < len(raw_args):
+        tok = raw_args[idx]
+        if tok == "--":
+            tool_args.extend(raw_args[idx + 1 :])
+            break
+        elif tok == "--check-only":
+            check_only = True
+            idx += 1
+        elif tok == "--target" and idx + 1 < len(raw_args):
+            target_bin = raw_args[idx + 1]
+            idx += 2
+        else:
+            tool_args.append(tok)
+            idx += 1
+
+    payload = json.dumps({
+        "tool_name": tool_name,
+        "pid": os.getpid(),
+        "workspace": os.getcwd(),
+        "args_text": " ".join(tool_args)[:240],
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        f"{bridge_url}/api/agents/authorize",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=2.5) as resp:
+            auth_data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        try:
+            err_body = json.loads(e.read().decode("utf-8"))
+            reason = err_body.get("reason") or err_body.get("error") or str(e)
+        except Exception:
+            reason = str(e)
+        sys.stderr.write(f"\033[1;31m✖ [SOVEREIGN BRIDGE GATEKEEPER] Execution Denied for '{tool_name}': {reason}\033[0m\n")
+        return 126
+    except Exception as e:
+        sys.stderr.write(
+            f"\033[1;31m✖ [SOVEREIGN BRIDGE GATEKEEPER] Cannot launch '{tool_name}': "
+            f"Sovereign Agent Bridge ({bridge_url}) is unreachable ({e}). "
+            f"All AI tools on ZothOS must connect through the active Sovereign Agent Bridge.\033[0m\n"
+        )
+        return 126
+
+    if not auth_data.get("authorized"):
+        sys.stderr.write(
+            f"\033[1;31m✖ [SOVEREIGN BRIDGE GATEKEEPER] Execution Denied for '{tool_name}': "
+            f"{auth_data.get('reason', 'Policy blocked')}\033[0m\n"
+        )
+        return 126
+
+    lease_id = auth_data.get("lease_id", "")
+    if check_only:
+        if getattr(args, "json", False):
+            print(json.dumps(auth_data))
+        else:
+            print(f"AUTHORIZED {lease_id}")
+        return 0
+
+    if not target_bin:
+        from .agent_introspector import get_tool_policies
+        for p in get_tool_policies():
+            if p["tool_name"] == tool_name:
+                target_bin = p["binary_target"]
+                break
+    if not target_bin or not os.path.exists(target_bin):
+        sys.stderr.write(f"✖ [SOVEREIGN BRIDGE GATEKEEPER] Target binary not found for '{tool_name}': {target_bin}\n")
+        return 127
+
+    env = os.environ.copy()
+    env["ZOTH_BRIDGE_AUTHORIZED"] = "1"
+    env["ZOTH_BRIDGE_LEASE_ID"] = lease_id
+    env["ZOTH_BRIDGE_URL"] = bridge_url
+    env["ZOTH_BRIDGE_SYNC_MD"] = str(auth_data.get("sync_md", "/home/zoth/Desktop/zoth-1nc0gn30-videos/AGENT_BRIDGE_SYNC.md"))
+
+    rc = 0
+    try:
+        proc = subprocess.run([target_bin] + tool_args, env=env)
+        rc = proc.returncode
+    except KeyboardInterrupt:
+        rc = 130
+    finally:
+        try:
+            rel_req = urllib.request.Request(
+                f"{bridge_url}/api/agents/release",
+                data=json.dumps({"lease_id": lease_id, "exit_code": rc}).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            urllib.request.urlopen(rel_req, timeout=1.5).close()
+        except Exception:
+            pass
+    return rc
+
+
 # ---------------------------------------------------------------------------
 # Argument Parser & Entry Point
 # ---------------------------------------------------------------------------
@@ -1345,6 +1494,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_ho.add_argument("--exec-muse", action="store_true", help="Also spawn a headless `muse exec` worker for this handoff.")
     p_ho.add_argument("--workspace", default="/home/zoth/Desktop/zoth-1nc0gn30-videos", help="Workspace for headless muse exec.")
 
+    # policy (AI tool gatekeeper policies)
+    p_pol = subparsers.add_parser("policy", parents=[common_parent], help="Inspect or toggle Sovereign Bridge AI Tool Gatekeeper policies.")
+    p_pol.add_argument("--enable", help="Enable a specific AI tool on the Bridge Gatekeeper.")
+    p_pol.add_argument("--disable", help="Disable/lock a specific AI tool on the Bridge Gatekeeper.")
+    p_pol.add_argument("--list", action="store_true", help="List all AI tool policies and leases.")
+
+    # gatekeep (mandatory bridge execution wrapper)
+    p_gk = subparsers.add_parser("gatekeep", parents=[common_parent], help="Authorize and execute an AI tool strictly through the Sovereign Agent Bridge (:8102).")
+    p_gk.add_argument("tool", help="AI tool identifier (muse, hermes, claude, codex, aider, opencode, ollama).")
+    p_gk.add_argument("--target", help="Real binary path to execute once authorized.")
+    p_gk.add_argument("--check-only", action="store_true", help="Only verify Bridge authorization and print lease without spawning binary.")
+    p_gk.add_argument("tool_args", nargs=argparse.REMAINDER, help="Arguments forwarded to the AI tool.")
+
     # diagnostics / doctor / platform
     subparsers.add_parser("diagnostics", parents=[common_parent], help="Run system diagnostics.")
     subparsers.add_parser("doctor", parents=[common_parent], help="Alias for diagnostics.")
@@ -1370,7 +1532,7 @@ def main() -> int:
         parser.print_help()
         return 0
 
-    if args.subcommand not in ("mcp",) and not args.json:
+    if args.subcommand not in ("mcp", "gatekeep") and not args.json:
         print_banner()
 
     if args.subcommand == "send":
@@ -1397,6 +1559,10 @@ def main() -> int:
         return handle_agents(args)
     elif args.subcommand == "handoff":
         return handle_handoff(args)
+    elif args.subcommand == "policy":
+        return handle_policy(args)
+    elif args.subcommand == "gatekeep":
+        return handle_gatekeep(args)
     elif args.subcommand == "serve":
         return handle_serve(args)
     elif args.subcommand == "mcp":

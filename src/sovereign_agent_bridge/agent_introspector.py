@@ -120,6 +120,55 @@ def _init_db() -> None:
                     "INSERT INTO agent_messages VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     seed_msgs,
                 )
+
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS ai_tool_policies (
+                    tool_name TEXT PRIMARY KEY,
+                    display_name TEXT NOT NULL,
+                    binary_target TEXT NOT NULL,
+                    enabled INTEGER NOT NULL DEFAULT 1,
+                    require_bridge INTEGER NOT NULL DEFAULT 1,
+                    total_runs INTEGER NOT NULL DEFAULT 0,
+                    denied_runs INTEGER NOT NULL DEFAULT 0,
+                    last_run_ts REAL NOT NULL DEFAULT 0,
+                    last_pid INTEGER NOT NULL DEFAULT 0,
+                    last_workspace TEXT NOT NULL DEFAULT '',
+                    last_args TEXT NOT NULL DEFAULT ''
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS ai_tool_leases (
+                    lease_id TEXT PRIMARY KEY,
+                    tool_name TEXT NOT NULL,
+                    pid INTEGER NOT NULL,
+                    workspace TEXT NOT NULL,
+                    args_text TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_ts REAL NOT NULL,
+                    ended_ts REAL NOT NULL DEFAULT 0,
+                    exit_code INTEGER NOT NULL DEFAULT 0
+                )
+                """
+            )
+            cur_pol = conn.execute("SELECT COUNT(*) FROM ai_tool_policies")
+            if cur_pol.fetchone()[0] == 0:
+                default_policies = [
+                    ("muse", "Meta Muse Code", "/opt/muse/muse", 1, 1, 3, 0, time.time() - 30, 987534, "/home/zoth/Desktop/zoth-1nc0gn30-videos", "muse (TUI + exec)"),
+                    ("agy", "Google Antigravity (AGY)", "/home/zoth/.gemini/antigravity-cli/bin/agy", 1, 1, 4, 0, time.time() - 5, os.getpid(), "/home/zoth", "agy session ab434014"),
+                    ("hermes", "Nous Hermes Agent", "/home/zoth/.hermes/hermes-agent/.hermes/bin/hermes", 1, 1, 2, 0, time.time() - 120, 0, "/home/zoth", "hermes gateway"),
+                    ("claude", "Anthropic Claude Code", "/usr/local/bin/claude", 1, 1, 0, 0, 0.0, 0, "", ""),
+                    ("codex", "OpenAI Codex CLI", "/usr/local/bin/codex", 1, 1, 0, 0, 0.0, 0, "", ""),
+                    ("aider", "Aider AI Pair Programmer", "/opt/zothos-ai-env/bin/aider", 1, 1, 0, 0, 0.0, 0, "", ""),
+                    ("opencode", "OpenCode AI Pair", "/usr/local/bin/opencode", 1, 1, 0, 0, 0.0, 0, "", ""),
+                    ("ollama", "Ollama Local LLM Runtime", "/usr/local/bin/ollama", 1, 1, 0, 0, 0.0, 0, "", ""),
+                ]
+                conn.executemany(
+                    "INSERT INTO ai_tool_policies VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    default_policies,
+                )
             conn.commit()
         finally:
             conn.close()
@@ -618,13 +667,232 @@ def sync_shared_markdown_bulletin() -> str:
     return content
 
 
+def get_tool_policies() -> List[Dict[str, Any]]:
+    """Return the Sovereign Bridge AI Tool Gatekeeper policy table."""
+    with _DB_LOCK:
+        conn = sqlite3.connect(str(BUS_DB))
+        conn.row_factory = sqlite3.Row
+        try:
+            rows = conn.execute(
+                "SELECT * FROM ai_tool_policies ORDER BY total_runs DESC, tool_name ASC"
+            ).fetchall()
+            out = []
+            now = time.time()
+            for r in rows:
+                last_ts = float(r["last_run_ts"] or 0.0)
+                out.append(
+                    {
+                        "tool_name": r["tool_name"],
+                        "display_name": r["display_name"],
+                        "binary_target": r["binary_target"],
+                        "enabled": bool(r["enabled"]),
+                        "require_bridge": bool(r["require_bridge"]),
+                        "total_runs": int(r["total_runs"]),
+                        "denied_runs": int(r["denied_runs"]),
+                        "last_run_ts": last_ts,
+                        "last_run_ago_sec": round(now - last_ts, 1) if last_ts > 0 else None,
+                        "last_pid": int(r["last_pid"] or 0),
+                        "last_workspace": r["last_workspace"],
+                        "last_args": r["last_args"],
+                    }
+                )
+            return out
+        finally:
+            conn.close()
+
+
+def set_tool_policy(
+    tool_name: str,
+    enabled: Optional[bool] = None,
+    require_bridge: Optional[bool] = None,
+) -> Dict[str, Any]:
+    """Update the Sovereign Bridge Gatekeeper policy for a specific AI tool."""
+    t_key = tool_name.strip().lower()
+    with _DB_LOCK:
+        conn = sqlite3.connect(str(BUS_DB))
+        try:
+            row = conn.execute(
+                "SELECT * FROM ai_tool_policies WHERE tool_name = ?", (t_key,)
+            ).fetchone()
+            if not row:
+                conn.execute(
+                    "INSERT INTO ai_tool_policies VALUES (?, ?, ?, ?, ?, 0, 0, 0, 0, '', '')",
+                    (
+                        t_key,
+                        t_key.upper(),
+                        f"/usr/local/bin/{t_key}",
+                        1 if enabled is None or enabled else 0,
+                        1 if require_bridge is None or require_bridge else 0,
+                    ),
+                )
+            else:
+                if enabled is not None:
+                    conn.execute(
+                        "UPDATE ai_tool_policies SET enabled = ? WHERE tool_name = ?",
+                        (1 if enabled else 0, t_key),
+                    )
+                if require_bridge is not None:
+                    conn.execute(
+                        "UPDATE ai_tool_policies SET require_bridge = ? WHERE tool_name = ?",
+                        (1 if require_bridge else 0, t_key),
+                    )
+            conn.commit()
+        finally:
+            conn.close()
+    sync_shared_markdown_bulletin()
+    for p in get_tool_policies():
+        if p["tool_name"] == t_key:
+            return p
+    return {"tool_name": t_key}
+
+
+def authorize_tool_execution(
+    tool_name: str,
+    pid: int = 0,
+    workspace: str = "",
+    args_text: str = "",
+) -> Dict[str, Any]:
+    """Gatekeep an AI tool invocation through the Sovereign Agent Bridge.
+
+    Every AI tool on ZothOS must connect here before executing. If the tool's
+    policy is disabled on the Bridge, execution is denied.
+    """
+    t_key = (tool_name or "unknown").strip().lower()
+    now = time.time()
+    lease_id = f"lease-{t_key}-{uuid.uuid4().hex[:10]}"
+    ws = workspace or os.getcwd()
+    clean_args = (args_text or "")[:240]
+
+    with _DB_LOCK:
+        conn = sqlite3.connect(str(BUS_DB))
+        conn.row_factory = sqlite3.Row
+        try:
+            row = conn.execute(
+                "SELECT * FROM ai_tool_policies WHERE tool_name = ?", (t_key,)
+            ).fetchone()
+            if not row:
+                conn.execute(
+                    "INSERT INTO ai_tool_policies VALUES (?, ?, ?, 1, 1, 0, 0, 0, 0, '', '')",
+                    (t_key, t_key.upper(), f"/usr/local/bin/{t_key}"),
+                )
+                enabled = True
+                require_bridge = True
+            else:
+                enabled = bool(row["enabled"])
+                require_bridge = bool(row["require_bridge"])
+
+            if not enabled:
+                conn.execute(
+                    "UPDATE ai_tool_policies SET denied_runs = denied_runs + 1, last_run_ts = ?, last_pid = ?, last_workspace = ?, last_args = ? WHERE tool_name = ?",
+                    (now, pid, ws, clean_args, t_key),
+                )
+                conn.execute(
+                    "INSERT INTO ai_tool_leases VALUES (?, ?, ?, ?, ?, 'DENIED', ?, ?, 126)",
+                    (lease_id, t_key, pid, ws, clean_args, now, now),
+                )
+                conn.commit()
+                return {
+                    "authorized": False,
+                    "tool_name": t_key,
+                    "lease_id": lease_id,
+                    "reason": f"AI tool '{t_key}' is currently LOCKED by Sovereign Agent Bridge Gatekeeper policy (:8102).",
+                }
+
+            conn.execute(
+                "UPDATE ai_tool_policies SET total_runs = total_runs + 1, last_run_ts = ?, last_pid = ?, last_workspace = ?, last_args = ? WHERE tool_name = ?",
+                (now, pid, ws, clean_args, t_key),
+            )
+            conn.execute(
+                "INSERT INTO ai_tool_leases VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?, 0, 0)",
+                (lease_id, t_key, pid, ws, clean_args, now),
+            )
+            # Log non-trivial runs (not mere --version/--help probes) to the Cross-Agent Message Bus
+            if clean_args not in ("--version", "-v", "--help", "-h"):
+                msg_id = uuid.uuid4().hex[:12]
+                conn.execute(
+                    "INSERT INTO agent_messages VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        msg_id,
+                        f"{t_key}-gatekeeper (PID {pid})",
+                        "sovereign-bridge (:8102)",
+                        "bridge-gatekeeper",
+                        f"AI Tool Connected & Authorized: {t_key}",
+                        f"Authorized `{t_key} {clean_args}` in workspace `{ws}` with Lease `{lease_id}`.",
+                        json.dumps([ws]),
+                        "delivered",
+                        now,
+                    ),
+                )
+            conn.commit()
+        finally:
+            conn.close()
+
+    sync_shared_markdown_bulletin()
+    return {
+        "authorized": True,
+        "tool_name": t_key,
+        "lease_id": lease_id,
+        "require_bridge": require_bridge,
+        "bridge_url": "http://127.0.0.1:8102",
+        "sync_md": str(SHARED_SYNC_MD),
+    }
+
+
+def release_tool_lease(lease_id: str, exit_code: int = 0) -> Dict[str, Any]:
+    """Mark an active AI tool Bridge lease as completed."""
+    now = time.time()
+    with _DB_LOCK:
+        conn = sqlite3.connect(str(BUS_DB))
+        try:
+            conn.execute(
+                "UPDATE ai_tool_leases SET status = 'COMPLETED', ended_ts = ?, exit_code = ? WHERE lease_id = ?",
+                (now, int(exit_code), lease_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    return {"lease_id": lease_id, "status": "COMPLETED", "exit_code": exit_code}
+
+
+def list_tool_leases(limit: int = 20) -> List[Dict[str, Any]]:
+    """Return recent AI tool execution leases tracked by the Sovereign Bridge Gatekeeper."""
+    with _DB_LOCK:
+        conn = sqlite3.connect(str(BUS_DB))
+        conn.row_factory = sqlite3.Row
+        try:
+            rows = conn.execute(
+                "SELECT * FROM ai_tool_leases ORDER BY created_ts DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+            now = time.time()
+            return [
+                {
+                    "lease_id": r["lease_id"],
+                    "tool_name": r["tool_name"],
+                    "pid": int(r["pid"]),
+                    "workspace": r["workspace"],
+                    "args_text": r["args_text"],
+                    "status": r["status"],
+                    "created_ts": float(r["created_ts"]),
+                    "created_ago_sec": round(now - float(r["created_ts"]), 1),
+                    "ended_ts": float(r["ended_ts"]),
+                    "exit_code": int(r["exit_code"]),
+                }
+                for r in rows
+            ]
+        finally:
+            conn.close()
+
+
 def get_live_agent_mesh_snapshot() -> Dict[str, Any]:
-    """Return unified real-time telemetry across Muse, Antigravity, Hermes, OS processes, and the Message Bus."""
+    """Return unified real-time telemetry across Muse, Antigravity, Hermes, OS processes, Gatekeeper Policies, and the Message Bus."""
     muse_list = inspect_muse_sessions(limit=3)
     agy_list = inspect_antigravity_sessions(limit=4)
     pipelines = inspect_hermes_and_workers()
     procs = _scan_live_processes()
     bus_msgs = list_bus_messages(limit=25)
+    policies = get_tool_policies()
+    leases = list_tool_leases(limit=20)
 
     return {
         "timestamp": time.time(),
@@ -635,10 +903,14 @@ def get_live_agent_mesh_snapshot() -> Dict[str, Any]:
             "live_processes_count": len(procs),
             "bus_messages_count": len(bus_msgs),
             "mastered_videos_count": pipelines["video_production_pipeline"]["total_mastered_mp4s"],
+            "gated_tools_count": len(policies),
+            "active_leases_count": sum(1 for l in leases if l["status"] == "ACTIVE"),
         },
         "muse_sessions": muse_list,
         "antigravity_sessions": agy_list,
         "pipelines": pipelines,
         "live_processes": procs,
         "bus_messages": bus_msgs,
+        "tool_policies": policies,
+        "tool_leases": leases,
     }
