@@ -92,11 +92,15 @@ Built entirely using the **Python Standard Library (Zero External Runtime Depend
 5. **Heartbeat Watchdog & Dead-Man Switch**
    - Real-time agent liveness monitoring (`ACTIVE` $\to$ `WARNING` $\to$ `DEAD` $\to$ `RECOVERED`).
    - Automated dead-man emergency alert dispatching via webhooks and multi-channel broadcasts.
-6. **Bridge Studio Web UI**
+6. **Live Cross-Agent Mesh Radar & Shared Handoff Bus (Muse · Antigravity · Hermes)**
+   - Real-time introspection of active AI coding sessions across the host: **Meta Muse Code** (`~/.local/share/muse/sessions/*/*/*/*/session.jsonl` & `tui-history.jsonl`), **Google Antigravity (AGY)** (`~/.gemini/antigravity-cli/brain/*/.system_generated/logs/transcript.jsonl`), **Hermes Agent Gateway**, and active rendering pipelines.
+   - Durable SQLite (`~/.config/zothos/agent-bridge-bus.db`) + Markdown (`AGENT_BRIDGE_SYNC.md`) cross-agent handoff bus with optional headless `muse exec --json --yolo` worker dispatch.
+   - CLI subcommands (`sovereign-agent-bridge agents [--json]`, `sovereign-agent-bridge handoff "<msg>" --to muse --subject "<subject>" [--exec-muse]`) and REST endpoints (`GET /api/agents/live`, `GET /api/agents/messages`, `POST /api/agents/message`, `POST /api/agents/sync`).
+7. **Bridge Studio Web UI**
    - Clean interface with design influenced by Material 3.
    - Real-time telemetry feed powered by Server-Sent Events (SSE `/api/events`).
-   - Interactive message dispatcher, consensus simulator, claims lock board, and countdown dials.
-7. **Model Context Protocol (MCP) Server**
+   - Interactive message dispatcher, Live Cross-Agent Mesh Radar, consensus simulator, claims lock board, and countdown dials.
+8. **Model Context Protocol (MCP) Server**
    - Native JSON-RPC 2.0 stdio server for instant integration into Claude Desktop, Cursor, and Antigravity.
 
 ---

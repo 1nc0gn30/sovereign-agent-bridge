@@ -123,8 +123,8 @@
     document.getElementById(`sovCloseBtn-${toolId}`).addEventListener('click', closeModal);
     document.getElementById(`sovActionBtn-${toolId}`).addEventListener('click', closeModal);
 
-    // Auto-launch if not seen
-    if (!localStorage.getItem(`sov_tutorial_seen_${toolId}`)) {
+    // Never auto-block the workstation on first load; only open when clicked or explicitly requested
+    if (config.autoOpen === true && !localStorage.getItem(`sov_tutorial_seen_${toolId}`)) {
       setTimeout(openModal, 600);
     }
 

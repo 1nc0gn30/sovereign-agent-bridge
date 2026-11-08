@@ -493,6 +493,19 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             self._send_json_response(gw.get_topology())
             return
 
+        # 8e. Live Cross-Agent Introspection (Muse, Antigravity, Hermes, Subagents & Shared Bus)
+        if path in ("/api/agents/live", "/api/agents"):
+            from .agent_introspector import get_live_agent_mesh_snapshot
+            self._send_json_response(get_live_agent_mesh_snapshot())
+            return
+
+        if path == "/api/agents/messages":
+            from .agent_introspector import list_bus_messages
+            limit = int(query.get("limit", [40])[0])
+            recipient = query.get("recipient", [None])[0]
+            self._send_json_response({"messages": list_bus_messages(limit=limit, recipient=recipient)})
+            return
+
         # 9. Static file serving or fallback to Embedded HTML Studio
         self._handle_static_or_fallback(path)
 
@@ -586,6 +599,33 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             data = body.get("data", {})
             published = self.ui_server.publish_event(event_type, data)
             self._send_json_response({"status": "published", "event": published})
+        elif path in ("/api/agents/message", "/api/agents/handoff", "/api/agents/dispatch"):
+            from .agent_introspector import post_bus_message
+            sender = str(body.get("sender") or body.get("from") or "operator").strip()
+            recipient = str(body.get("recipient") or body.get("to") or "all-agents").strip()
+            subject = str(body.get("subject") or body.get("title") or "Cross-Agent Handoff").strip()
+            msg_body = str(body.get("body") or body.get("content") or body.get("message") or "").strip()
+            if not msg_body:
+                self._send_error_json("Message 'body' or 'content' is required", status_code=400)
+                return
+            rec = post_bus_message(
+                sender=sender,
+                recipient=recipient,
+                subject=subject,
+                body=msg_body,
+                channel=str(body.get("channel") or "zoth-bridge-bus"),
+                artifacts=body.get("artifacts") if isinstance(body.get("artifacts"), list) else [],
+                dispatch_muse_exec=bool(body.get("dispatch_muse_exec", False)),
+                workspace=str(body.get("workspace") or "/home/zoth/Desktop/zoth-1nc0gn30-videos"),
+            )
+            self.ui_server.publish_event("agent_bus_message", rec)
+            self._send_json_response({"status": "ok", "message": rec})
+        elif path == "/api/agents/sync":
+            from .agent_introspector import sync_shared_markdown_bulletin, get_live_agent_mesh_snapshot
+            sync_shared_markdown_bulletin()
+            snap = get_live_agent_mesh_snapshot()
+            self.ui_server.publish_event("agent_mesh_synced", snap["summary"])
+            self._send_json_response({"status": "ok", "snapshot": snap})
         else:
             self._send_error_json(f"Unknown POST endpoint: {path}", status_code=404)
 

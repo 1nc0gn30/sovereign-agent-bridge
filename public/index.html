@@ -647,6 +647,56 @@
 
     <div class="grid-deck">
 
+      <!-- Row 1: Live Cross-Agent Mesh Radar (Muse · Antigravity · Hermes · Subagents) (12 Cols) -->
+      <div class="span-12 card" style="border: 1px solid rgba(212,175,55,0.45);">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">⚡ Live Cross-Agent Mesh Radar (Meta Muse · Google Antigravity · Hermes · Subagents)</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="chip-badge" id="mesh-summary-badge">Scanning Host...</span>
+            <button class="btn btn-outlined" style="padding:4px 12px;font-size:11px;" onclick="syncAgentMesh()">Sync Ledger</button>
+          </div>
+        </div>
+        <p class="card-subtitle" style="margin-bottom:14px;">Real-time introspection of active AI coding sessions, todo queues, latest tool executions, mastered video pipelines, and the shared SQLite/Markdown handoff bus.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));gap:14px;margin-bottom:16px;" id="live-agents-grid">
+          <!-- Populated dynamically from /api/agents/live -->
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));gap:14px;">
+          <div style="background:var(--md-sys-color-surface-container-high);border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;padding:14px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;">
+              <span>Shared Cross-Agent Handoff Bus</span>
+              <span class="chip-badge" id="bus-count-badge">0 Msgs</span>
+            </div>
+            <div id="agent-bus-feed" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;font-size:12px;"></div>
+          </div>
+
+          <div style="background:var(--md-sys-color-surface-container-high);border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="font-weight:700;font-size:13px;">Post Cross-Agent Handoff / Dispatch Muse Worker</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <input id="bus-sender" class="input-box" placeholder="Sender Agent" value="antigravity-lead">
+              <select id="bus-recipient" class="input-box">
+                <option value="muse-wonder-1.0 (01a1b743)">Meta Muse Code (01a1b743)</option>
+                <option value="antigravity-lead (ab434014)">Antigravity Lead (ab434014)</option>
+                <option value="antigravity-peer (2e8bf02f)">Antigravity Peer (2e8bf02f)</option>
+                <option value="hermes-gateway">Hermes Agent Gateway</option>
+                <option value="all-agents">All Active Agents (*)</option>
+              </select>
+            </div>
+            <input id="bus-subject" class="input-box" placeholder="Handoff Subject" value="Parallel Video Batch & Bridge Sync">
+            <textarea id="bus-body" class="input-box" rows="2" placeholder="Enter instructions, file paths, or status update...">Batches 7-12 (51 new -14 LUFS videos, 76 total) mastered in /home/zoth/Desktop/zoth-1nc0gn30-videos/out/. Ready for next creative wave.</textarea>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <label style="font-size:11.5px;display:flex;align-items:center;gap:5px;cursor:pointer;">
+                <input type="checkbox" id="bus-exec-muse"> Also spawn headless <code>muse exec</code> worker
+              </label>
+              <button class="btn btn-filled" style="margin-left:auto;" onclick="postAgentBusHandoff()">Send to Agent Bus</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Column 1: Multi-Channel Monitor (4 Cols) -->
       <div class="span-4 card">
         <div class="card-header">
@@ -1198,16 +1248,108 @@
       } catch (e) {}
     }
 
+    async function fetchLiveAgentMesh() {
+      try {
+        const res = await fetch('/api/agents/live');
+        const snap = await res.json();
+        const s = snap.summary || {};
+        const badge = document.getElementById('mesh-summary-badge');
+        if (badge) {
+          badge.innerText = `${s.muse_sessions_count || 0} Muse • ${s.antigravity_sessions_count || 0} AGY • ${s.mastered_videos_count || 0} Mastered MP4s`;
+        }
+        const grid = document.getElementById('live-agents-grid');
+        if (grid) {
+          const cards = [];
+          (snap.muse_sessions || []).slice(0, 2).forEach(m => {
+            const todosHtml = (m.todos || []).slice(0, 3).map(t => `<div style="font-size:11px;opacity:0.9;">✓ [${t.status}] ${t.text}</div>`).join('');
+            cards.push(`
+              <div style="padding:12px;border-radius:10px;background:var(--md-sys-color-surface-container-high);border-left:4px solid #D4AF37;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <strong>Meta Muse (${m.short_id})</strong>
+                  <span class="chip-badge">${m.status}</span>
+                </div>
+                <div style="font-size:11px;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px;">
+                  Model: ${m.model} • PID: ${m.pid || 'idle'} • Subagents: ${m.subagents_spawned}
+                </div>
+                ${todosHtml}
+              </div>
+            `);
+          });
+          (snap.antigravity_sessions || []).slice(0, 2).forEach(a => {
+            const lastTool = (a.recent_tools && a.recent_tools.length) ? a.recent_tools[a.recent_tools.length - 1] : null;
+            cards.push(`
+              <div style="padding:12px;border-radius:10px;background:var(--md-sys-color-surface-container-high);border-left:4px solid #34a853;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <strong>Antigravity (${a.short_id})</strong>
+                  <span class="chip-badge">${a.status} • Step ${a.step_index}</span>
+                </div>
+                <div style="font-size:11px;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px;">
+                  Active ${a.last_active_ago_sec}s ago • Log: ${a.log_size_mb} MB
+                </div>
+                ${lastTool ? `<div style="font-size:11px;font-family:monospace;">Tool: ${lastTool.name} (${lastTool.args.slice(0, 68)})</div>` : ''}
+              </div>
+            `);
+          });
+          grid.innerHTML = cards.join('');
+        }
+        const busFeed = document.getElementById('agent-bus-feed');
+        const busBadge = document.getElementById('bus-count-badge');
+        if (busBadge && snap.bus_messages) busBadge.innerText = `${snap.bus_messages.length} Msgs`;
+        if (busFeed && snap.bus_messages) {
+          busFeed.innerHTML = snap.bus_messages.slice(0, 8).map(msg => `
+            <div style="padding:8px 10px;border-radius:8px;background:var(--md-sys-color-surface-container);border:1px solid var(--md-sys-color-outline-variant);">
+              <div style="display:flex;justify-content:space-between;font-weight:600;font-size:11.5px;">
+                <span>${msg.sender} → ${msg.recipient}</span>
+                <span style="opacity:0.7;">${msg.ago_sec}s ago</span>
+              </div>
+              <div style="font-weight:600;color:var(--google-blue);font-size:11.5px;">${msg.subject}</div>
+              <div style="font-size:11px;opacity:0.9;">${msg.body}</div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Agent mesh fetch error', e);
+      }
+    }
+
+    async function postAgentBusHandoff() {
+      const sender = document.getElementById('bus-sender').value;
+      const recipient = document.getElementById('bus-recipient').value;
+      const subject = document.getElementById('bus-subject').value;
+      const body = document.getElementById('bus-body').value;
+      const dispatch_muse_exec = document.getElementById('bus-exec-muse').checked;
+      try {
+        const res = await fetch('/api/agents/message', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ sender, recipient, subject, body, dispatch_muse_exec })
+        });
+        const d = await res.json();
+        if (d.status === 'ok') {
+          appendTelemetry('AGENT_BUS', `Handoff sent: ${sender} -> ${recipient} (${subject})`);
+          fetchLiveAgentMesh();
+        }
+      } catch (e) {
+        appendTelemetry('ERROR', `Agent bus error: ${e}`);
+      }
+    }
+
+    async function syncAgentMesh() {
+      await fetch('/api/agents/sync', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
+      fetchLiveAgentMesh();
+    }
+
     function refreshDashboard() {
       fetchClaims();
       fetchWatchdog();
       refreshStats();
+      fetchLiveAgentMesh();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       setupSSE();
       refreshDashboard();
-      setInterval(refreshStats, 5000);
+      setInterval(() => { refreshStats(); fetchLiveAgentMesh(); }, 5000);
     });
   </script>
   

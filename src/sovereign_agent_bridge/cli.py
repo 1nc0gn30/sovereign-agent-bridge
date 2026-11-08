@@ -885,11 +885,21 @@ def handle_watchdog(args: argparse.Namespace) -> int:
 
 
 def handle_serve(args: argparse.Namespace) -> int:
-    """Launch Bridge Studio Web UI."""
+    """Launch Bridge Studio Web UI using the full SSE + Cross-Agent Introspection BridgeUIServer."""
     host = args.host
     port = args.port
-    public_path = Path(args.public_dir) if args.public_dir else None
+    try:
+        from .ui_server import BridgeUIServer
+        server = BridgeUIServer(host=host, port=port)
+        url = f"http://{host if host != '0.0.0.0' else '127.0.0.1'}:{port}"
+        print(f"{Color.bold('Sovereign Bridge Studio Web UI')} listening on {Color.cyan(url)}")
+        print(f"  {Color.dim('REST API endpoints:')} /api/health, /api/agents/live, /api/agents/message, /api/events, /api/channels, /api/claims")
+        server.start(blocking=True)
+        return 0
+    except Exception as e:
+        print(f"{Color.yellow('Falling back to basic HTTP server:')} {e}")
 
+    public_path = Path(args.public_dir) if args.public_dir else None
     handler_factory = lambda *a, **kw: BridgeStudioHTTPHandler(*a, public_dir=public_path, **kw)
     httpd = ThreadedHTTPServer((host, port), handler_factory)
 
@@ -1169,6 +1179,57 @@ def handle_federation(args: argparse.Namespace) -> int:
     return 0
 
 
+def handle_agents(args: argparse.Namespace) -> int:
+    """Inspect live AI agents (Muse, Antigravity, Hermes, Subagents) and shared message bus."""
+    from .agent_introspector import get_live_agent_mesh_snapshot, sync_shared_markdown_bulletin
+    sync_shared_markdown_bulletin()
+    snap = get_live_agent_mesh_snapshot()
+    if getattr(args, "json", False):
+        print(json.dumps(snap, indent=2))
+        return 0
+
+    print(Color.bold(Color.cyan("⚡ LIVE SOVEREIGN AGENT MESH (Muse · Antigravity · Hermes · Subagents)")))
+    s = snap["summary"]
+    print(
+        f"  Muse Sessions: {s['muse_sessions_count']} | AGY Sessions: {s['antigravity_sessions_count']} | "
+        f"Live Processes: {s['live_processes_count']} | Bus Messages: {s['bus_messages_count']} | "
+        f"Mastered Videos: {s['mastered_videos_count']}\n"
+    )
+    for m in snap["muse_sessions"]:
+        print(Color.bold(f"  [MUSE] {m['short_id']} ({m['model']}) — {m['status']} (PID: {m.get('pid') or 'idle'}, {m['last_active_ago_sec']}s ago)"))
+        for td in m.get("todos", [])[:4]:
+            print(f"    • Todo [{td.get('status')}]: {td.get('text')}")
+    for a in snap["antigravity_sessions"][:3]:
+        print(Color.bold(f"  [AGY]  {a['short_id']} — {a['status']} (Step {a['step_index']}, {a['last_active_ago_sec']}s ago)"))
+        if a.get("recent_tools"):
+            lt = a["recent_tools"][-1]
+            print(f"    • Tool: {lt['name']} -> {lt['args'][:90]}")
+    print(Color.bold(Color.cyan("\n  Recent Cross-Agent Bus Handoffs:")))
+    for msg in snap["bus_messages"][:6]:
+        print(f"    [{msg['id'][:6]}] {msg['sender']} -> {msg['recipient']} | {msg['subject']}: {msg['body'][:100]}")
+    return 0
+
+
+def handle_handoff(args: argparse.Namespace) -> int:
+    """Post a cross-agent handoff message to the shared SQLite + Markdown bus (and optionally spawn muse exec)."""
+    from .agent_introspector import post_bus_message
+    rec = post_bus_message(
+        sender=getattr(args, "sender", "antigravity-cli"),
+        recipient=getattr(args, "to", "muse"),
+        subject=getattr(args, "subject", "Cross-Agent Handoff"),
+        body=args.message,
+        dispatch_muse_exec=getattr(args, "exec_muse", False),
+        workspace=getattr(args, "workspace", "/home/zoth/Desktop/zoth-1nc0gn30-videos"),
+    )
+    if getattr(args, "json", False):
+        print(json.dumps(rec, indent=2))
+    else:
+        print(Color.bold(Color.green(f"✓ Posted Cross-Agent Handoff #{rec['id']} ({rec['sender']} -> {rec['recipient']})")))
+        if rec.get("muse_exec_pid"):
+            print(f"  Spawned headless Muse worker PID {rec['muse_exec_pid']} (log: {rec['muse_exec_log']})")
+    return 0
+
+
 # ---------------------------------------------------------------------------
 # Argument Parser & Entry Point
 # ---------------------------------------------------------------------------
@@ -1272,6 +1333,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_fed.add_argument("-t", "--topic", default="*", help="Topic filter for federation broadcast.")
     p_fed.add_argument("--topology", action="store_true", help="Display federation topology.")
 
+    # agents (live cross-agent introspection)
+    subparsers.add_parser("agents", parents=[common_parent], help="Inspect live AI agents (Muse, Antigravity, Hermes, Subagents) and shared message bus.")
+
+    # handoff (post message to shared bus / trigger muse exec)
+    p_ho = subparsers.add_parser("handoff", parents=[common_parent], help="Post a cross-agent handoff message to Muse / Antigravity / Hermes.")
+    p_ho.add_argument("message", help="Handoff message body.")
+    p_ho.add_argument("--to", default="muse", help="Recipient agent ID (default: muse).")
+    p_ho.add_argument("--sender", "--from", dest="sender", default="antigravity-lead", help="Sender agent ID.")
+    p_ho.add_argument("--subject", default="Cross-Agent Handoff", help="Message subject line.")
+    p_ho.add_argument("--exec-muse", action="store_true", help="Also spawn a headless `muse exec` worker for this handoff.")
+    p_ho.add_argument("--workspace", default="/home/zoth/Desktop/zoth-1nc0gn30-videos", help="Workspace for headless muse exec.")
+
     # diagnostics / doctor / platform
     subparsers.add_parser("diagnostics", parents=[common_parent], help="Run system diagnostics.")
     subparsers.add_parser("doctor", parents=[common_parent], help="Alias for diagnostics.")
@@ -1320,6 +1393,10 @@ def main() -> int:
         return handle_envelope(args)
     elif args.subcommand == "federation":
         return handle_federation(args)
+    elif args.subcommand == "agents":
+        return handle_agents(args)
+    elif args.subcommand == "handoff":
+        return handle_handoff(args)
     elif args.subcommand == "serve":
         return handle_serve(args)
     elif args.subcommand == "mcp":
