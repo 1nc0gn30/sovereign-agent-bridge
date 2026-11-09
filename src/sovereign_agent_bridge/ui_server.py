@@ -514,6 +514,18 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             })
             return
 
+        if path in ("/api/swarm/telemetry", "/api/swarm", "/api/agents/swarm"):
+            import importlib.util
+            swarm_script = Path(__file__).resolve().parent.parent.parent / "bin" / "zoth_hermes_swarm.py"
+            if swarm_script.exists():
+                spec = importlib.util.spec_from_file_location("zoth_hermes_swarm", str(swarm_script))
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                self._send_json_response(mod.get_swarm_telemetry_summary())
+            else:
+                self._send_json_response({"error": "zoth_hermes_swarm.py not found"}, status_code=404)
+            return
+
         # 9. Static file serving or fallback to Embedded HTML Studio
         self._handle_static_or_fallback(path)
 

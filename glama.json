@@ -1,0 +1,28 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/connector.json",
+  "name": "sovereign-agent-bridge",
+  "displayName": "Sovereign Agent Bridge",
+  "description": "Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, Dialectic Consensus, and Watchdogs.",
+  "version": "0.1.0",
+  "author": "Sovereign Agent Bridge Developers",
+  "repository": "https://github.com/sovereign-agent-bridge/sovereign-agent-bridge",
+  "homepage": "https://sovereign-agent-bridge.netlify.app",
+  "transport": "stdio",
+  "category": "Agent Communication",
+  "environmentVariables": [],
+  "buildSpec": {
+    "command": "pip install sovereign-agent-bridge",
+    "test": "sovereign-bridge --version"
+  },
+  "tags": [
+    "multi-agent",
+    "signal",
+    "simplex",
+    "telegram",
+    "matrix",
+    "consensus",
+    "watchdog",
+    "mcp",
+    "zero-dependency"
+  ]
+}

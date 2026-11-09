@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nullaitech/sovereign-agent-bridge",
+  "description": "Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, Dialectic Consensus, and Watchdogs.",
+  "version": "0.1.0",
+  "title": "Sovereign Agent Bridge",
+  "websiteUrl": "https://github.com/sovereign-agent-bridge/sovereign-agent-bridge",
+  "repository": {
+    "url": "https://github.com/sovereign-agent-bridge/sovereign-agent-bridge",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "sovereign-agent-bridge",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeHint": "uvx",
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "sovereign-agent-bridge"
+        },
+        {
+          "type": "positional",
+          "value": "mcp"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/sovereign-agent-bridge/sovereign-agent-bridge/main/assets/hero-banner.svg",
+      "type": "image/svg+xml"
+    }
+  ]
+}

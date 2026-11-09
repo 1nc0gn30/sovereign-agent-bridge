@@ -704,6 +704,23 @@
             </div>
           </div>
         </div>
+        <!-- Hermes Sovereign Swarm Telemetry & Cost Visualizer Deck -->
+        <div style="background:linear-gradient(135deg, rgba(16,15,12,0.96), rgba(26,23,17,0.94));border:1px solid rgba(220,186,115,0.45);border-radius:12px;padding:16px;margin-top:16px;color:#F2EADD;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-weight:800;font-size:15px;color:#F5C65C;letter-spacing:0.3px;">🐝 Nous Hermes Sovereign Swarm Telemetry &amp; $20 Credit Ledger</div>
+              <div style="font-size:11.5px;color:#DCBA73;">Real-time tracking of active Hermes Agent profiles, tasks created vs. finished, compute duration, and exact credit spend.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="chip-badge" id="swarm-kpi-badge" style="background:rgba(52,211,153,0.16);color:#34D399;border:1px solid rgba(52,211,153,0.4);">8 Runs • 49/49 Tasks • $0.0202 Spent</span>
+              <a href="/assets/swarm-telemetry-board.jpg" target="_blank" class="btn btn-outlined" style="padding:4px 12px;font-size:11px;color:#F5C65C;border-color:rgba(220,186,115,0.5);text-decoration:none;">View 1080p Telemetry Board</a>
+            </div>
+          </div>
+
+          <div id="swarm-kpis-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:10px;margin-bottom:14px;"></div>
+          <div id="swarm-agents-row" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:14px;"></div>
+          <div id="swarm-runs-table" style="display:flex;flex-direction:column;gap:6px;max-height:290px;overflow-y:auto;"></div>
+        </div>
       </div>
 
       <!-- Column 1: Multi-Channel Monitor (4 Cols) -->
@@ -1374,17 +1391,81 @@
       fetchLiveAgentMesh();
     }
 
+    async function fetchSwarmTelemetry() {
+      try {
+        const res = await fetch('/api/swarm/telemetry');
+        if (!res.ok) return;
+        const data = await res.json();
+        const t = data.totals || {};
+        const badge = document.getElementById('swarm-kpi-badge');
+        if (badge) {
+          badge.innerText = `${t.total_swarm_runs || 0} Runs • ${t.tasks_finished || 0}/${t.tasks_created || 0} Tasks (${t.completion_rate_pct || 100}%) • $${(t.total_spent_usd || 0).toFixed(4)} Spent ($${(t.remaining_budget_usd || 20).toFixed(4)} Left)`;
+        }
+        const kpisRow = document.getElementById('swarm-kpis-row');
+        if (kpisRow) {
+          const items = [
+            { lbl: 'AGENTS & SWARM RUNS', val: `${t.total_swarm_runs || 0} RUNS`, sub: `${t.distinct_agent_profiles_ran || 4} Hermes Models Active`, col: '#F5C65C' },
+            { lbl: 'TASKS FINISHED', val: `${t.tasks_finished || 0} / ${t.tasks_created || 0}`, sub: `${t.completion_rate_pct || 100}% Mission Completion`, col: '#34D399' },
+            { lbl: 'TOTAL RUN DURATION', val: (t.total_duration_formatted || '0m 0s').toUpperCase(), sub: `${t.total_duration_sec || 0}s Wall-Clock Compute`, col: '#DCBA73' },
+            { lbl: 'TOTAL SWARM COST', val: `$${(t.total_spent_usd || 0).toFixed(4)}`, sub: `Daily Cap: $${(t.daily_cap_usd || 2.4).toFixed(2)}/day`, col: '#F5C65C' },
+            { lbl: 'WEEKLY CREDIT LEFT', val: `$${(t.remaining_budget_usd || 20).toFixed(4)}`, sub: `${t.budget_remaining_pct || 99.9}% of $20.00 Remaining`, col: '#34D399' },
+          ];
+          kpisRow.innerHTML = items.map(k => `
+            <div style="background:rgba(10,10,9,0.9);border:1px solid rgba(220,186,115,0.3);border-left:4px solid ${k.col};border-radius:8px;padding:10px 12px;">
+              <div style="font-size:10px;font-family:monospace;color:#A8A092;font-weight:700;">${k.lbl}</div>
+              <div style="font-size:21px;font-weight:800;color:#F2EADD;margin:2px 0;">${k.val}</div>
+              <div style="font-size:10.5px;font-family:monospace;color:${k.col};">${k.sub}</div>
+            </div>
+          `).join('');
+        }
+        const agentsRow = document.getElementById('swarm-agents-row');
+        if (agentsRow && data.agent_breakdown) {
+          agentsRow.innerHTML = Object.values(data.agent_breakdown).map(ab => `
+            <div style="background:rgba(14,14,12,0.92);border:1px solid rgba(220,186,115,0.25);border-radius:8px;padding:10px 12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <strong style="color:#F2EADD;font-size:12.5px;">${ab.profile.toUpperCase()}</strong>
+                <span style="font-family:monospace;font-size:11px;font-weight:700;color:${ab.total_cost_usd === 0 ? '#34D399' : '#F5C65C'};">${ab.total_cost_usd === 0 ? 'FREE ($0.00)' : '$' + ab.total_cost_usd.toFixed(4)}</span>
+              </div>
+              <div style="font-family:monospace;font-size:10.5px;color:#DCBA73;margin-bottom:4px;">${ab.model}</div>
+              <div style="font-family:monospace;font-size:11px;color:#F2EADD;">Runs: <b>${ab.runs_count}</b> • Tasks: <b>${ab.tasks_finished}/${ab.tasks_created}</b> • Time: <b>${ab.total_duration_sec}s</b></div>
+            </div>
+          `).join('');
+        }
+        const runsTable = document.getElementById('swarm-runs-table');
+        if (runsTable && data.runs) {
+          runsTable.innerHTML = data.runs.slice().reverse().map((r, idx) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(12,12,10,0.92);border:1px solid rgba(220,186,115,0.2);border-radius:7px;padding:8px 12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:260px;">
+                <div style="font-weight:700;font-size:12px;color:#F2EADD;">
+                  <span style="color:#F5C65C;font-family:monospace;">[${r.wave || 'Wave'} · ${r.profile}]</span> ${r.task_title}
+                </div>
+                <div style="font-size:11px;color:#DCBA73;opacity:0.95;">${r.accomplishment}</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;font-family:monospace;font-size:11px;">
+                <span style="padding:3px 8px;border-radius:5px;background:rgba(52,211,153,0.14);color:#34D399;border:1px solid rgba(52,211,153,0.35);">${r.tasks_finished}/${r.tasks_created} TASKS</span>
+                <span style="padding:3px 8px;border-radius:5px;background:rgba(220,186,115,0.12);color:#F2EADD;border:1px solid rgba(220,186,115,0.3);">${r.duration_sec}s</span>
+                <span style="padding:3px 8px;border-radius:5px;background:rgba(245,198,92,0.15);color:${r.cost_usd === 0 ? '#34D399' : '#F5C65C'};border:1px solid rgba(245,198,92,0.35);font-weight:700;">$${(r.cost_usd || 0).toFixed(4)}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Swarm telemetry fetch error', e);
+      }
+    }
+
     function refreshDashboard() {
       fetchClaims();
       fetchWatchdog();
       refreshStats();
       fetchLiveAgentMesh();
+      fetchSwarmTelemetry();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       setupSSE();
       refreshDashboard();
-      setInterval(() => { refreshStats(); fetchLiveAgentMesh(); }, 5000);
+      setInterval(() => { refreshStats(); fetchLiveAgentMesh(); fetchSwarmTelemetry(); }, 5000);
     });
   </script>
   
