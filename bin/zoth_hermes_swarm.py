@@ -6,10 +6,10 @@ Orchestrates 4 budget-guarded Nous Research Hermes Agent profiles through the
 Sovereign Agent Bridge (:8102) so a $20 credit balance runs all week long (7+ days)
 enhancing:
   1. ZOTHOS (zoth-os & zoth-os-website -> zothos.nullai.tech)
-  2. ZOTHOS Lite (zothos-lite -> lite.zoth.nullai.tech)
+  2. ZOTHOS Lite (zothos-lite -> zothos-lite.nullai.tech)
   3. ZothNet (zothnet, zothnet-website, zothnet-android -> zothnet.nullai.tech)
   4. Zoth Studio v2 (zoth-studio-v2 -> zoth.nullai.tech)
-  5. 1nc0gn30 · World of Zoth (world-of-zoth -> nealfrazier.tech)
+  5. 1nc0gn30 Hub & World of Zoth (1nc0gn30.si, 1nc0gn30.github.io, world-of-zoth)
   6. NullAI Platform (nullai2026 & hermes-zoth -> nullai.tech)
 
 Also provides full telemetry logging & visual poster/dashboard rendering:
@@ -42,7 +42,7 @@ DAILY_CAP_USD = 2.40  # $2.40/day * 7 days = $16.80/week (leaves $3.20 reserve)
 
 PROFILES = {
     "zoth-free-scout": {
-        "model": "reflection/beam-1.0-501b-a23b:free",
+        "model": "deepseek/deepseek-v4-flash-0731",
         "provider": "nous",
         "input_per_1m_usd": 0.00,
         "cached_per_1m_usd": 0.00,
@@ -122,17 +122,27 @@ PRODUCTS = [
         "repo_dir": "/home/zoth/NullAITech/zoth-studio-v2",
         "site_dir": "/home/zoth/NullAITech/zoth-studio-v2",
         "public_dir": "/home/zoth/NullAITech/zoth-studio-v2/public",
-        "summary": "77+ 100% free in-browser developer, cybersecurity, AEO/SEO, and AI agent safety tools with local daemon bridges and zero paywalls.",
+        "summary": "77 100% free tools (55 in-browser + 22 CLI daemons) across developer, cybersecurity, AEO/SEO, and AI agent safety workflows with zero paywalls.",
+    },
+    {
+        "id": "1nc0gn30-si",
+        "name": "1nc0gn30 Sovereign Hub",
+        "domain": "https://1nc0gn30.si",
+        "github": "https://github.com/1nc0gn30/1nc0gn30.si",
+        "repo_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
+        "site_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
+        "public_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
+        "summary": "Official 1nc0gn30 portal for free AI, security & web tools (Zoth Studio 77 tools, ZothOS v3.4.0, ZothOS-Lite v1.2, FieldKit, and World of Zoth).",
     },
     {
         "id": "1nc0gn30",
-        "name": "1nc0gn30 · World of Zoth",
-        "domain": "https://www.nealfrazier.tech",
+        "name": "1nc0gn30 · Open-Source & World of Zoth",
+        "domain": "https://1nc0gn30.github.io",
         "github": "https://github.com/1nc0gn30",
-        "repo_dir": "/home/zoth/Desktop/world-of-zoth",
-        "site_dir": "/home/zoth/Desktop/world-of-zoth",
-        "public_dir": "/home/zoth/Desktop/world-of-zoth",
-        "summary": "Interactive 3D WebGL World of Zoth experience, Real-Life World of Zoth ARRI Alexa 65 cinema showcase, and @1nc0gn30 open-source hub.",
+        "repo_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
+        "site_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
+        "public_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
+        "summary": "Interactive @1nc0gn30 open-source hub connecting 1nc0gn30.si, Zoth Studio (77 tools), ZothOS v3.4.0, ZothOS-Lite v1.2, and World of Zoth.",
     },
     {
         "id": "nullai",
@@ -142,7 +152,7 @@ PRODUCTS = [
         "repo_dir": "/home/zoth/NullAITech/nullai2026",
         "site_dir": "/home/zoth/NullAITech/nullai2026",
         "public_dir": "/home/zoth/NullAITech/nullai2026/public",
-        "summary": "Sovereign AI research & engineering platform uniting ZOTHOS, ZOTHOS Lite, ZothNet, Zoth Studio, and hermes-zoth.",
+        "summary": "Sovereign AI research & engineering lab founded by 1nc0gn30 uniting FieldKit, ZOTHOS v3.4.0, ZOTHOS-Lite v1.2, ZothNet, Zoth Studio (77 tools), and hermes-zoth.",
     },
 ]
 
@@ -688,8 +698,8 @@ def render_swarm_visual_board(telemetry: dict, out_path: str = str(VISUAL_POSTER
         ry += 82
 
     # Footer attribution
-    d.text((48, 1030), "Engineered by Neal Frazier Tech (@1nc0gn30) · NullAI Platform · zothos.nullai.tech · zoth.nullai.tech", font=f_mono(17, False), fill=GOLD)
-    d.text((1448, 1030), "100% Open-Access · Zero Paywalls · Nous Hermes v1.3", font=f_mono(17, True), fill=IVORY)
+    d.text((48, 1030), "Engineered by @1nc0gn30 · NullAI Platform · 1nc0gn30.si · zothos.nullai.tech · zoth.nullai.tech", font=f_mono(17, False), fill=GOLD)
+    d.text((1448, 1030), "100% Open-Access · Zero Paywalls · Nous Hermes v1.4", font=f_mono(17, True), fill=IVORY)
 
     final_img = Image.alpha_composite(base.convert("RGBA"), overlay).convert("RGB")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -720,11 +730,11 @@ def ensure_ecosystem_aeo_and_crosslinks() -> dict:
     ecosystem_footer = """
 ## NullAI & Zoth Sovereign Ecosystem Cross-Index (2026)
 - **ZOTHOS (Debian 13 AI Workstation OS)**: https://zothos.nullai.tech | https://github.com/1nc0gn30/zoth-os
-- **ZOTHOS Lite (Instant Browser Sovereign OS)**: https://zothos-lite.nullai.tech | https://github.com/1nc0gn30/zothos-lite
+- **ZOTHOS-Lite v1.2 (Amnesic Monotone Security OS)**: https://zothos-lite.nullai.tech | https://github.com/1nc0gn30/zothos-lite
 - **ZothNet (Zero-Cloud Encrypted Mesh Network)**: https://zothnet.nullai.tech | https://github.com/1nc0gn30/zothnet
-- **Zoth Studio v2 (77+ Free Zero-Cloud Dev, Security & AEO Tools)**: https://zoth.nullai.tech | https://github.com/1nc0gn30/zoth-studio-v2
+- **Zoth Studio v2 (77 Free Tools: 55 Browser + 22 CLI)**: https://zoth.nullai.tech | https://github.com/1nc0gn30/zoth-studio-v2
 - **Hermes-Zoth (Nous Research Hermes Agent Plugin)**: https://github.com/1nc0gn30/hermes-zoth
-- **1nc0gn30 · World of Zoth**: https://www.nealfrazier.tech | https://github.com/1nc0gn30
+- **1nc0gn30 Sovereign Hub & Open-Source**: https://1nc0gn30.si | https://1nc0gn30.github.io | https://github.com/1nc0gn30
 - **NullAI Platform**: https://nullai.tech | https://github.com/1nc0gn30/nullai2026
 - **Support Open-Access Engineering (Buy Us a Coffee)**: https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X | Solana: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`
 """.strip()
@@ -758,7 +768,7 @@ def ensure_ecosystem_aeo_and_crosslinks() -> dict:
     return report
 
 
-def run_hermes_mission(profile: str, mission: str, tasks_count: int = 4) -> dict:
+def run_hermes_mission(profile: str, mission: str, tasks_count: int = 4, cwd: str = "") -> dict:
     ledger = load_ledger()
     today = datetime.date.today().isoformat()
     today_spent = ledger["daily_spend"].get(today, 0.0)
@@ -787,13 +797,14 @@ def run_hermes_mission(profile: str, mission: str, tasks_count: int = 4) -> dict
 
     t0 = time.monotonic()
     cmd = [HERMES_BIN, "chat", "-p", profile, "-Q", "-q", mission]
+    run_cwd = cwd if (cwd and os.path.isdir(cwd)) else None
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=420, cwd=run_cwd)
         output = (proc.stdout or "") + ("\n" + proc.stderr if proc.stderr else "")
         ok = proc.returncode == 0
     except Exception as e:
         output = f"Hermes execution note: {e}"
-        # Even if the CLI hit the 300s ceiling, check if the agent already wrote its target file
+        # Even if the CLI hit the ceiling, check if the agent already wrote its target file
         ok = True
     dur_sec = round(time.monotonic() - t0, 1)
 
@@ -1207,6 +1218,8 @@ def main():
     parser.add_argument("--audit-ecosystem", action="store_true", help="Audit & upgrade AEO/llms.txt across all 6 Zoth/NullAI products")
     parser.add_argument("--run-cycle", choices=list(PROFILES.keys()), help="Execute a budget-guarded Hermes agent profile")
     parser.add_argument("--mission", type=str, default="", help="Custom prompt for --run-cycle")
+    parser.add_argument("--cwd", type=str, default="", help="Working directory for Hermes agent execution")
+    parser.add_argument("--tasks-count", type=int, default=5, help="Number of sub-tasks tracked in ledger")
     args = parser.parse_args()
 
     if args.marathon and args.marathon > 0:
@@ -1227,7 +1240,7 @@ def main():
                 "ZOTHOS Lite, ZothNet, Zoth Studio, 1nc0gn30, and NullAI."
             ),
             "zoth-auditor": (
-                "Call zoth_ecosystem_targets and zoth_status, inspect the SEO/AEO health across all 6 flagship "
+                "Call zoth_ecosystem_targets and zoth_status, inspect the SEO/AEO health across all flagship "
                 "products, and post a 4-bullet technical audit summary onto the Sovereign Agent Bridge using zoth_bridge_post."
             ),
             "zoth-growth": (
@@ -1241,7 +1254,7 @@ def main():
             ),
         }
         mission = args.mission.strip() or default_missions[args.run_cycle]
-        res = run_hermes_mission(args.run_cycle, mission)
+        res = run_hermes_mission(args.run_cycle, mission, tasks_count=args.tasks_count, cwd=args.cwd)
         print(json.dumps(res, indent=2))
         return
 
