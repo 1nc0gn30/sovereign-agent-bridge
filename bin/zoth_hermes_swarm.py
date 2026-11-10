@@ -1020,13 +1020,87 @@ MARATHON_MISSION_QUEUE = [
         "Wave 13F — Operation Sovereign Expansion (Waves 10A-13F) Executive Dossier & ROI Scorecard",
         "Review all deliverables from Waves 10A through 13E, verify file sizes and zero-placeholder quality, and write the comprehensive Operation II Executive Dossier & ROI Scorecard to /home/zoth/NullAITech/growth-distribution/audits/wave13_operation2_executive_dossier.md. Broadcast via zoth_bridge_post.",
     ),
+    # --- PHASE 5: ZOTHOS Live OS Binary Parity, Zero-Paywall Verification & Video Motion Blueprints (Waves 14A-14F) ---
+    (
+        "zoth-builder",
+        6,
+        "Wave 14A — ZothOS Live OS Binary Parity & Systemd Service Hardening",
+        "Inspect /home/zoth/NullAITech/zoth-os and /usr/local/bin against all 77 tools in /home/zoth/NullAITech/zoth-studio-v2/src/data/toolsData.js. Verify CLI binary wrappers, systemd service templates, and chroot inclusion scripts. Author a complete hardening report to /home/zoth/NullAITech/growth-distribution/audits/wave14_zothos_binary_parity_and_systemd.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-auditor",
+        6,
+        "Wave 14B — Zero-Paywall Support Rail & Triple-Viewport Visual Invariant Verification",
+        "Perform a full-fleet verification of the Zero-Paywall Invariant across all 77 tools and web apps: ensure zero paywalls, zero license modals, zero blur gates, and clean 'Buy Us a Coffee' (Stripe) and Solana tip address integration. Author the audit report to /home/zoth/NullAITech/growth-distribution/audits/wave14_zero_paywall_and_viewport_invariant.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-growth",
+        8,
+        "Wave 14C — Dev.to / Hashnode 5-Part Series Publishing Payload & Social Syndication",
+        "Expand the 5-part engineering tutorial series with full Markdown content, SEO tags, cover image prompts, and code snippets ready for copy-paste publishing on Dev.to, Hashnode, Medium, and Substack. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave14_devto_hashnode_syndication.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-free-scout",
+        8,
+        "Wave 14D — Global Developer Directories & Open-Source AI Catalogs Reconnaissance",
+        "Scan the web for 20+ active developer tool directories, MCP registries, and open-source AI indexes (e.g. Toolify, Futurepedia, SaaSHub, AlternativeTo, OpenTools). Document exact submission URLs, tag requirements, and formatted listings in /home/zoth/NullAITech/growth-distribution/submissions/wave14_global_ai_directories.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-builder",
+        6,
+        "Wave 14E — Sovereign Agent Bridge Matrix & Signal Gateway Architecture",
+        "Design and document the end-to-end P2P agent communication architecture connecting Hermes Swarm, OpenCode, Codex, Antigravity, and Claude Code over local SSE, JSON-RPC, and encrypted Signal/Matrix channels into /home/zoth/NullAITech/growth-distribution/docs/wave14_bridge_matrix_signal_gateway.md. Broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-growth",
+        8,
+        "Wave 14F — YouTube Shorts, TikTok & X Video Showreel Transcripts & Motion Graphics Blueprints",
+        "Author 10 high-velocity 15s and 30s video showreel scripts and motion graphics prompt recipes based on Claude Motion / Revid.ai methodology for Zoth Studio, ZOTHOS, and ZothNet. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave14_video_showreels_and_motion_blueprints.md and broadcast via zoth_bridge_post.",
+    ),
+    # --- PHASE 6: Wearables DAT Fieldkit, OWASP Security & Phase III Executive Dossier (Waves 15A-15F) ---
+    (
+        "zoth-builder",
+        6,
+        "Wave 15A — Ray-Ban Meta Wearables DAT Fieldkit Android Streaming Bridge & RPC",
+        "Inspect /home/zoth/hackathon-copy/Zoth-Meta-Hackathon and nullai-fieldkit. Detail the Wearables DAT C++ JNI bridge, camera frame streaming, low-latency audio capture, and local AI inference RPC integration in /home/zoth/NullAITech/growth-distribution/docs/wave15_meta_wearables_streaming_rpc.md. Broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-auditor",
+        6,
+        "Wave 15B — Sovereign Stack OWASP Top 10 & Daemon Security Penetration Report",
+        "Conduct a comprehensive security audit of local loopback daemons (:3000, :8094, :8102, :8135, :8149). Test for CORS policies, path traversal, command injection, and input sanitization. Save the security report to /home/zoth/NullAITech/growth-distribution/audits/wave15_owasp_daemon_security_audit.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-growth",
+        8,
+        "Wave 15C — Product Hunt & Hacker News Show HN Launch Package Optimization",
+        "Produce the final, polished launch assets for Product Hunt and Hacker News Show HN: tagline iterations, first comment, product walkthrough, founder story, and day-one community mobilization plan. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave15_ph_show_hn_optimized_launch.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-free-scout",
+        8,
+        "Wave 15D — Technical Podcasts, Substack Newsletters & Developer Community Directory Map",
+        "Identify and map 30+ top developer podcasts (Changelog, Latent Space, Software Engineering Daily), Linux User Groups, and AI newsletters for creator outreach with personalized pitches. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave15_podcasts_newsletters_lug_map.md and broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-builder",
+        6,
+        "Wave 15E — Neuro-Memory Daemon Karpathy LLM Wiki Synthesis & Graph Visualizer",
+        "Architect and document the Karpathy LLM Wiki auto-compilation engine and 3D visual graph explorer linking Obsidian notes, STDP synapses, and live agent memories in /home/zoth/NullAITech/growth-distribution/docs/wave15_neuro_memory_llm_wiki_visualizer.md. Broadcast via zoth_bridge_post.",
+    ),
+    (
+        "zoth-auditor",
+        6,
+        "Wave 15F — Operation Sovereign Expansion Phase III Executive Dossier & Strategic Roadmap",
+        "Review all deliverables across Waves 14A through 15E, calculate cumulative ROI and token economics, and author the definitive Phase III Executive Dossier to /home/zoth/NullAITech/growth-distribution/audits/wave15_operation3_executive_dossier.md. Broadcast via zoth_bridge_post.",
+    ),
 ]
 
 
-def run_marathon_swarm(duration_minutes: int = 360, max_budget_usd: float = 0.35) -> dict:
+def run_marathon_swarm(duration_minutes: int = 360, max_budget_usd: float = 0.35, start_wave_idx: int = 24) -> dict:
     """
     Run a continuous, autonomous multi-agent Hermes Swarm loop for `duration_minutes`
-    (e.g. 360 minutes = 6 hours), cycling through all 24 specialized missions across
+    (e.g. 360 minutes = 6 hours), cycling through all specialized missions across
     zoth-builder, zoth-growth, zoth-auditor, and zoth-free-scout while updating the
     1080p visual telemetry board and Sovereign Agent Bridge after every single wave.
     """
@@ -1037,7 +1111,7 @@ def run_marathon_swarm(duration_minutes: int = 360, max_budget_usd: float = 0.35
     deadline = start_ts + duration_sec
     spent_in_marathon = 0.0
     completed_waves = []
-    idx = 0
+    idx = start_wave_idx
     total_planned_waves = len(MARATHON_MISSION_QUEUE)
 
     post_bridge(
@@ -1128,6 +1202,7 @@ def main():
     parser.add_argument("--render-visual", action="store_true", help="Render 1920x1080 1nc0gn30 Obsidian & Gold Swarm Telemetry Board JPG")
     parser.add_argument("--marathon", type=int, default=0, help="Run a continuous autonomous swarm marathon for N minutes (e.g. --marathon 60)")
     parser.add_argument("--max-marathon-budget", type=float, default=0.25, help="Max USD budget for the marathon session (default $0.25)")
+    parser.add_argument("--start-wave", type=int, default=24, help="Starting wave index in mission queue (default 24 = Wave 14A)")
     parser.add_argument("--json", action="store_true", help="Emit JSON output")
     parser.add_argument("--audit-ecosystem", action="store_true", help="Audit & upgrade AEO/llms.txt across all 6 Zoth/NullAI products")
     parser.add_argument("--run-cycle", choices=list(PROFILES.keys()), help="Execute a budget-guarded Hermes agent profile")
@@ -1135,7 +1210,7 @@ def main():
     args = parser.parse_args()
 
     if args.marathon and args.marathon > 0:
-        res = run_marathon_swarm(duration_minutes=args.marathon, max_budget_usd=args.max_marathon_budget)
+        res = run_marathon_swarm(duration_minutes=args.marathon, max_budget_usd=args.max_marathon_budget, start_wave_idx=args.start_wave)
         print(json.dumps(res, indent=2))
         return
 
