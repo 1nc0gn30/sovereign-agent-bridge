@@ -4,7 +4,7 @@
   "displayName": "Sovereign Agent Bridge",
   "description": "Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, Dialectic Consensus, and Watchdogs.",
   "version": "0.1.0",
-  "author": "Neal Frazier Tech (@1nc0gn30)",
+  "author": "1nc0gn30 (@1nc0gn30)",
   "repository": "https://github.com/1nc0gn30/sovereign-agent-bridge",
   "homepage": "https://sovereign-agent-bridge.netlify.app",
   "transport": "stdio",

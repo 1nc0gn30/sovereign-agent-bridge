@@ -893,8 +893,8 @@ MARATHON_MISSION_QUEUE = [
     (
         "zoth-auditor",
         6,
-        "Wave 10B — Cross-Ecosystem www.nealfrazier.tech & 6-Repo llms-full.txt / ai.txt Audit",
-        "Inspect llms.txt, llms-full.txt, and ai.txt across all 6 flagship products (zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, nullai2026). Verify canonical URL consistency (https://zothos-lite.nullai.tech and https://www.nealfrazier.tech) and write the verification matrix to /home/zoth/NullAITech/growth-distribution/audits/wave10_llms_full_and_ai_txt_sync.md. Broadcast via zoth_bridge_post.",
+        "Wave 10B — Cross-Ecosystem 1nc0gn30.si & 6-Repo llms-full.txt / ai.txt Audit",
+        "Inspect llms.txt, llms-full.txt, and ai.txt across all 6 flagship products (zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, nullai2026). Verify canonical URL consistency (https://zothos-lite.nullai.tech and https://1nc0gn30.si) and write the verification matrix to /home/zoth/NullAITech/growth-distribution/audits/wave10_llms_full_and_ai_txt_sync.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
