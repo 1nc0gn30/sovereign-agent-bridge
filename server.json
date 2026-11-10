@@ -4,9 +4,9 @@
   "description": "Zero-dependency sovereign multi-agent communication bridge with Signal, SimpleX, Telegram, Matrix, Dialectic Consensus, and Watchdogs.",
   "version": "0.1.0",
   "title": "Sovereign Agent Bridge",
-  "websiteUrl": "https://github.com/sovereign-agent-bridge/sovereign-agent-bridge",
+  "websiteUrl": "https://github.com/1nc0gn30/sovereign-agent-bridge",
   "repository": {
-    "url": "https://github.com/sovereign-agent-bridge/sovereign-agent-bridge",
+    "url": "https://github.com/1nc0gn30/sovereign-agent-bridge",
     "source": "github"
   },
   "packages": [
