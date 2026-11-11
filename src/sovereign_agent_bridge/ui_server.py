@@ -142,7 +142,7 @@ class InMemoryBridgeState:
                 "type": "signal",
                 "enabled": True,
                 "status": "healthy",
-                "account": "+19482047987",
+                "account": "+15550000000",
                 "endpoint": "http://127.0.0.1:8080",
                 "latency_ms": 12.4,
                 "last_seen": time.time(),
@@ -636,7 +636,7 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
                 channel=str(body.get("channel") or "zoth-bridge-bus"),
                 artifacts=body.get("artifacts") if isinstance(body.get("artifacts"), list) else [],
                 dispatch_muse_exec=bool(body.get("dispatch_muse_exec", False)),
-                workspace=str(body.get("workspace") or "/home/zoth/Desktop/zoth-1nc0gn30-videos"),
+                workspace=str(body.get("workspace") or os.path.expanduser("~/NullAITech")),
             )
             self.ui_server.publish_event("agent_bus_message", rec)
             self._send_json_response({"status": "ok", "message": rec})
@@ -1362,7 +1362,7 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
             <span class="badge" id="channel-count">5 Channels</span>
           </div>
           <div id="channels-list">
-            <div class="channel-row"><span>Signal Adapter (+19482047987)</span><span class="badge">12ms</span></div>
+            <div class="channel-row"><span>Signal Adapter (+15550000000)</span><span class="badge">12ms</span></div>
             <div class="channel-row"><span>SimpleX Stealth Node</span><span class="badge">18ms</span></div>
             <div class="channel-row"><span>Telegram Bot Relay</span><span class="badge">45ms</span></div>
             <div class="channel-row"><span>Matrix Federated Room</span><span class="badge">62ms</span></div>
@@ -1403,7 +1403,7 @@ EMBEDDED_HTML_STUDIO = """<!DOCTYPE html>
           </div>
           <div class="form-group">
             <label class="form-label">Recipient / Group Endpoint</label>
-            <input id="send-recipient" class="form-control" type="text" placeholder="+19482047987 or room_id" value="+19482047987">
+            <input id="send-recipient" class="form-control" type="text" placeholder="+15550000000 or room_id" value="+15550000000">
           </div>
           <div class="form-group">
             <label class="form-label">Message Payload</label>

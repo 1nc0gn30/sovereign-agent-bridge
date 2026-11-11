@@ -31,11 +31,11 @@ import urllib.request
 from pathlib import Path
 
 BRIDGE_URL = "http://127.0.0.1:8102"
-HERMES_BIN = "/home/zoth/.local/bin/hermes"
-LEDGER_PATH = Path("/home/zoth/.hermes/swarm_budget_ledger.json")
-RUNS_DIR = Path("/home/zoth/NullAITech/growth-distribution/swarm-runs")
-VISUAL_POSTER_PATH = Path("/home/zoth/NullAITech/growth-distribution/SWARM-TELEMETRY-BOARD.jpg")
-LIVE_LEDGER_MD = Path("/home/zoth/NullAITech/growth-distribution/SWARM-LIVE-LEDGER.md")
+HERMES_BIN = os.path.expanduser("~/.local/bin/hermes")
+LEDGER_PATH = Path("~/.hermes/swarm_budget_ledger.json").expanduser()
+RUNS_DIR = Path("~/NullAITech/growth-distribution/swarm-runs").expanduser()
+VISUAL_POSTER_PATH = Path("~/NullAITech/growth-distribution/SWARM-TELEMETRY-BOARD.jpg").expanduser()
+LIVE_LEDGER_MD = Path("~/NullAITech/growth-distribution/SWARM-LIVE-LEDGER.md").expanduser()
 
 TOTAL_WEEKLY_BUDGET_USD = 20.00
 DAILY_CAP_USD = 2.40  # $2.40/day * 7 days = $16.80/week (leaves $3.20 reserve)
@@ -89,9 +89,9 @@ PRODUCTS = [
         "name": "ZOTHOS",
         "domain": "https://zothos.nullai.tech",
         "github": "https://github.com/1nc0gn30/zoth-os",
-        "repo_dir": "/home/zoth/NullAITech/zoth-os",
-        "site_dir": "/home/zoth/NullAITech/zoth-os-website",
-        "public_dir": "/home/zoth/NullAITech/zoth-os-website/public",
+        "repo_dir": os.path.expanduser("~/NullAITech/zoth-os"),
+        "site_dir": os.path.expanduser("~/NullAITech/zoth-os-website"),
+        "public_dir": os.path.expanduser("~/NullAITech/zoth-os-website/public"),
         "summary": "Sovereign Debian 13 (Trixie) AI & Cybersecurity Linux OS with KDE Plasma 6, 77+ CLI tools, Neuro-Memory (:8094), and Sovereign Agent Bridge (:8102).",
     },
     {
@@ -99,9 +99,9 @@ PRODUCTS = [
         "name": "ZOTHOS Lite",
         "domain": "https://zothos-lite.nullai.tech",
         "github": "https://github.com/1nc0gn30/zothos-lite",
-        "repo_dir": "/home/zoth/NullAITech/zothos-lite",
-        "site_dir": "/home/zoth/NullAITech/zothos-lite",
-        "public_dir": "/home/zoth/NullAITech/zothos-lite/public",
+        "repo_dir": os.path.expanduser("~/NullAITech/zothos-lite"),
+        "site_dir": os.path.expanduser("~/NullAITech/zothos-lite"),
+        "public_dir": os.path.expanduser("~/NullAITech/zothos-lite/public"),
         "summary": "Instant in-browser and portable sovereign ZOTHOS desktop environment with zero-bloat terminal and live tool execution.",
     },
     {
@@ -109,9 +109,9 @@ PRODUCTS = [
         "name": "ZothNet",
         "domain": "https://zothnet.nullai.tech",
         "github": "https://github.com/1nc0gn30/zothnet",
-        "repo_dir": "/home/zoth/NullAITech/zothnet",
-        "site_dir": "/home/zoth/NullAITech/zothnet-website",
-        "public_dir": "/home/zoth/NullAITech/zothnet-website/public",
+        "repo_dir": os.path.expanduser("~/NullAITech/zothnet"),
+        "site_dir": os.path.expanduser("~/NullAITech/zothnet-website"),
+        "public_dir": os.path.expanduser("~/NullAITech/zothnet-website/public"),
         "summary": "Zero-cloud encrypted mesh network and P2P discovery layer linking ZOTHOS workstations, Android nodes, and local AI agents.",
     },
     {
@@ -119,9 +119,9 @@ PRODUCTS = [
         "name": "Zoth Studio v2",
         "domain": "https://zoth.nullai.tech",
         "github": "https://github.com/1nc0gn30/zoth-studio-v2",
-        "repo_dir": "/home/zoth/NullAITech/zoth-studio-v2",
-        "site_dir": "/home/zoth/NullAITech/zoth-studio-v2",
-        "public_dir": "/home/zoth/NullAITech/zoth-studio-v2/public",
+        "repo_dir": os.path.expanduser("~/NullAITech/zoth-studio-v2"),
+        "site_dir": os.path.expanduser("~/NullAITech/zoth-studio-v2"),
+        "public_dir": os.path.expanduser("~/NullAITech/zoth-studio-v2/public"),
         "summary": "77 100% free tools (55 in-browser + 22 CLI daemons) across developer, cybersecurity, AEO/SEO, and AI agent safety workflows with zero paywalls.",
     },
     {
@@ -129,9 +129,9 @@ PRODUCTS = [
         "name": "1nc0gn30 Sovereign Hub",
         "domain": "https://1nc0gn30.si",
         "github": "https://github.com/1nc0gn30/1nc0gn30.si",
-        "repo_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
-        "site_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
-        "public_dir": "/home/zoth/NullAITech/sites/1nc0gn30-si",
+        "repo_dir": os.path.expanduser("~/NullAITech/sites/1nc0gn30-si"),
+        "site_dir": os.path.expanduser("~/NullAITech/sites/1nc0gn30-si"),
+        "public_dir": os.path.expanduser("~/NullAITech/sites/1nc0gn30-si"),
         "summary": "Official 1nc0gn30 portal for free AI, security & web tools (Zoth Studio 77 tools, ZothOS v3.4.0, ZothOS-Lite v1.2, FieldKit, and World of Zoth).",
     },
     {
@@ -139,9 +139,9 @@ PRODUCTS = [
         "name": "1nc0gn30 · Open-Source & World of Zoth",
         "domain": "https://1nc0gn30.github.io",
         "github": "https://github.com/1nc0gn30",
-        "repo_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
-        "site_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
-        "public_dir": "/home/zoth/NullAITech/1nc0gn30.github.io",
+        "repo_dir": os.path.expanduser("~/NullAITech/1nc0gn30.github.io"),
+        "site_dir": os.path.expanduser("~/NullAITech/1nc0gn30.github.io"),
+        "public_dir": os.path.expanduser("~/NullAITech/1nc0gn30.github.io"),
         "summary": "Interactive @1nc0gn30 open-source hub connecting 1nc0gn30.si, Zoth Studio (77 tools), ZothOS v3.4.0, ZothOS-Lite v1.2, and World of Zoth.",
     },
     {
@@ -149,9 +149,9 @@ PRODUCTS = [
         "name": "NullAI Platform",
         "domain": "https://nullai.tech",
         "github": "https://github.com/1nc0gn30/nullai2026",
-        "repo_dir": "/home/zoth/NullAITech/nullai2026",
-        "site_dir": "/home/zoth/NullAITech/nullai2026",
-        "public_dir": "/home/zoth/NullAITech/nullai2026/public",
+        "repo_dir": os.path.expanduser("~/NullAITech/nullai2026"),
+        "site_dir": os.path.expanduser("~/NullAITech/nullai2026"),
+        "public_dir": os.path.expanduser("~/NullAITech/nullai2026/public"),
         "summary": "Sovereign AI research & engineering lab founded by 1nc0gn30 uniting FieldKit, ZOTHOS v3.4.0, ZOTHOS-Lite v1.2, ZothNet, Zoth Studio (77 tools), and hermes-zoth.",
     },
 ]
@@ -582,7 +582,7 @@ def render_swarm_visual_board(telemetry: dict, out_path: str = str(VISUAL_POSTER
     base = Image.new("RGB", (W, H), BG_OBSIDIAN)
 
     # Composite pure right-side 1nc0gn30 gold astrolabe art (zero baked-in text!)
-    art_path = "/home/zoth/Pictures/1nc0gn30-campaign/raw/01-zothos-your-rules.png"
+    art_path = os.path.expanduser("~/Pictures/1nc0gn30-campaign/raw/01-zothos-your-rules.png")
     if os.path.exists(art_path):
         art_raw = Image.open(art_path).convert("RGB")
         asw, ash = art_raw.size
@@ -708,9 +708,9 @@ def render_swarm_visual_board(telemetry: dict, out_path: str = str(VISUAL_POSTER
     # Sync to Sovereign Agent Bridge public assets and all active Brain conversation directories
     import shutil
     sync_targets = [
-        Path("/home/zoth/NullAITech/sovereign-agent-bridge/public/assets/swarm-telemetry-board.jpg"),
+        Path("~/NullAITech/sovereign-agent-bridge/public/assets/swarm-telemetry-board.jpg").expanduser(),
     ]
-    brain_root = Path("/home/zoth/.gemini/antigravity-cli/brain")
+    brain_root = Path("~/.gemini/antigravity-cli/brain").expanduser()
     if brain_root.exists():
         for bdir in brain_root.glob("*/"):
             if bdir.is_dir() and not bdir.name.startswith("."):
@@ -755,7 +755,7 @@ def ensure_ecosystem_aeo_and_crosslinks() -> dict:
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "products_checked": len(PRODUCTS),
         "llms_txt_upgraded": upgraded,
-        "growth_hub": "/home/zoth/NullAITech/growth-distribution/README.md",
+        "growth_hub": os.path.expanduser("~/NullAITech/growth-distribution/README.md"),
     }
     post_bridge(
         sender="hermes-auditor",
@@ -888,222 +888,222 @@ MARATHON_MISSION_QUEUE = [
         "zoth-builder",
         6,
         "Wave 10A — ZOTHOS Lite Canonical Domain & Netlify Production Deployment Bundle",
-        "Inspect /home/zoth/NullAITech/zothos-lite (public/index.html, llms.txt, robots.txt, sitemap.xml, netlify.toml). Verify that https://zothos-lite.nullai.tech is aligned across all files, write a ready-to-run Netlify & DNS deployment/verification guide and bash script summary into /home/zoth/NullAITech/growth-distribution/audits/wave10_zothos_lite_deployment_fix.md, and broadcast completion via zoth_bridge_post.",
+        "Inspect ~/NullAITech/zothos-lite (public/index.html, llms.txt, robots.txt, sitemap.xml, netlify.toml). Verify that https://zothos-lite.nullai.tech is aligned across all files, write a ready-to-run Netlify & DNS deployment/verification guide and bash script summary into ~/NullAITech/growth-distribution/audits/wave10_zothos_lite_deployment_fix.md, and broadcast completion via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 10B — Cross-Ecosystem 1nc0gn30.si & 6-Repo llms-full.txt / ai.txt Audit",
-        "Inspect llms.txt, llms-full.txt, and ai.txt across all 6 flagship products (zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, nullai2026). Verify canonical URL consistency (https://zothos-lite.nullai.tech and https://1nc0gn30.si) and write the verification matrix to /home/zoth/NullAITech/growth-distribution/audits/wave10_llms_full_and_ai_txt_sync.md. Broadcast via zoth_bridge_post.",
+        "Inspect llms.txt, llms-full.txt, and ai.txt across all 6 flagship products (zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, nullai2026). Verify canonical URL consistency (https://zothos-lite.nullai.tech and https://1nc0gn30.si) and write the verification matrix to ~/NullAITech/growth-distribution/audits/wave10_llms_full_and_ai_txt_sync.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         8,
         "Wave 10C — 6-Repo GitHub Release Changelogs, Tags, SECURITY.md & CITATION.cff Kit",
-        "Write production-ready GitHub Release notes (ZOTHOS v3.4.0, ZOTHOS Lite v1.1.0, ZothNet v1.2.0, Zoth Studio v2.4.0, NullAI v2026.1, hermes-zoth v1.3.0) plus standardized CITATION.cff and SECURITY.md templates for academic & AI citation into /home/zoth/NullAITech/growth-distribution/docs/github_releases_and_citation_kit.md. Broadcast via zoth_bridge_post.",
+        "Write production-ready GitHub Release notes (ZOTHOS v3.4.0, ZOTHOS Lite v1.1.0, ZothNet v1.2.0, Zoth Studio v2.4.0, NullAI v2026.1, hermes-zoth v1.3.0) plus standardized CITATION.cff and SECURITY.md templates for academic & AI citation into ~/NullAITech/growth-distribution/docs/github_releases_and_citation_kit.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 10D — GitHub Topics, Repo About Descriptions & Pinned Repo Conversion Matrix",
-        "Call zoth_ecosystem_targets and zoth_studio_catalog, then generate a complete GitHub SEO optimization guide with exact `gh repo edit --add-topic ... --description ... --homepage ...` commands for the 6 flagship repos and top 20 tool repos. Save to /home/zoth/NullAITech/growth-distribution/submissions/gh_repo_topics_optimization.md and broadcast via zoth_bridge_post.",
+        "Call zoth_ecosystem_targets and zoth_studio_catalog, then generate a complete GitHub SEO optimization guide with exact `gh repo edit --add-topic ... --description ... --homepage ...` commands for the 6 flagship repos and top 20 tool repos. Save to ~/NullAITech/growth-distribution/submissions/gh_repo_topics_optimization.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 10E — Category Showcase Pack #7: Network Engineering, DNS, WireGuard & Packet Ops",
-        "Call zoth_studio_search(query='network') and zoth_studio_search(query='dns') and write 8 high-converting X, Reddit (r/networking, r/homelab), and LinkedIn showcase posts for ZothNet, DNS Recon, Subnet/CIDR calculators, and HTTP Header inspectors into /home/zoth/NullAITech/growth-distribution/submissions/showcase_pack_07_network_dns_ops.md. Broadcast via zoth_bridge_post.",
+        "Call zoth_studio_search(query='network') and zoth_studio_search(query='dns') and write 8 high-converting X, Reddit (r/networking, r/homelab), and LinkedIn showcase posts for ZothNet, DNS Recon, Subnet/CIDR calculators, and HTTP Header inspectors into ~/NullAITech/growth-distribution/submissions/showcase_pack_07_network_dns_ops.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 10F — Category Showcase Pack #8: Media, Audio Synthesis, Video Showreels & SVG Forge",
-        "Call zoth_studio_search(query='audio') and zoth_studio_search(query='svg') and write 8 deep-dive showcase posts for Zoth Studio's audio synthesizers, vector/SVG plotters, dither shaders, and motion graphics tools into /home/zoth/NullAITech/growth-distribution/submissions/showcase_pack_08_media_audio_svg.md. Broadcast via zoth_bridge_post.",
+        "Call zoth_studio_search(query='audio') and zoth_studio_search(query='svg') and write 8 deep-dive showcase posts for Zoth Studio's audio synthesizers, vector/SVG plotters, dither shaders, and motion graphics tools into ~/NullAITech/growth-distribution/submissions/showcase_pack_08_media_audio_svg.md. Broadcast via zoth_bridge_post.",
     ),
     # --- PHASE 2: Completing the 9-Category Matrix, Zero-Egress Attestation & Dev.to Series (Waves 11A-11F) ---
     (
         "zoth-growth",
         9,
         "Wave 11A — Category Showcase Pack #9: Developer Productivity, Obsidian & E-Commerce",
-        "Call zoth_studio_search(query='markdown') and zoth_studio_search(query='json') and complete the 9-category Zoth Studio showcase series with 9 posts covering Obsidian Second Brain, JSON/YAML/SQL transformers, and Etsy/Shopify margin & SEO tools into /home/zoth/NullAITech/growth-distribution/submissions/showcase_pack_09_productivity_commerce.md. Broadcast via zoth_bridge_post.",
+        "Call zoth_studio_search(query='markdown') and zoth_studio_search(query='json') and complete the 9-category Zoth Studio showcase series with 9 posts covering Obsidian Second Brain, JSON/YAML/SQL transformers, and Etsy/Shopify margin & SEO tools into ~/NullAITech/growth-distribution/submissions/showcase_pack_09_productivity_commerce.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 11B — ZOTHOS Live ISO (toram) Boot, KVM Sandbox & Hardware Compatibility Guide",
-        "Inspect /home/zoth/NullAITech/zoth-os and write a comprehensive ZOTHOS v3.4.0 Live ISO Flashing (Ventoy/dd), Amnesic `toram` RAM-Only Boot, KVM/QEMU Guest Tuning, and KDE Plasma 6 / XFCE Desktop Hardening Guide into /home/zoth/NullAITech/growth-distribution/docs/zothos_iso_boot_and_hardware_guide.md. Broadcast via zoth_bridge_post.",
+        "Inspect ~/NullAITech/zoth-os and write a comprehensive ZOTHOS v3.4.0 Live ISO Flashing (Ventoy/dd), Amnesic `toram` RAM-Only Boot, KVM/QEMU Guest Tuning, and KDE Plasma 6 / XFCE Desktop Hardening Guide into ~/NullAITech/growth-distribution/docs/zothos_iso_boot_and_hardware_guide.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 11C — 77-Tool Client-Side WebCrypto & Zero-Egress Privacy Attestation Report",
-        "Inspect /home/zoth/NullAITech/zoth-studio-v2/src/data/toolsData.js and index.html. Verify zero third-party ad/telemetry trackers, 100% browser-local execution, and local-only daemon bridges, and author a formal Zero-Egress Privacy & Security Attestation Report in /home/zoth/NullAITech/growth-distribution/audits/wave11_zero_egress_privacy_attestation.md. Broadcast via zoth_bridge_post.",
+        "Inspect ~/NullAITech/zoth-studio-v2/src/data/toolsData.js and index.html. Verify zero third-party ad/telemetry trackers, 100% browser-local execution, and local-only daemon bridges, and author a formal Zero-Egress Privacy & Security Attestation Report in ~/NullAITech/growth-distribution/audits/wave11_zero_egress_privacy_attestation.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 11D — 5 Long-Form Technical Tutorials for Dev.to, Hashnode, Medium & Substack",
-        "Write 5 complete, code-rich technical tutorials (1: Orchestrating 4 Nous Hermes Agents Under $0.15/Week, 2: Zero-Cloud JWT & Env Secret Auditing in WebCrypto, 3: Building an Amnesic Debian 13 AI Workstation with ZOTHOS, 4: AEO Schema.org @graph & llms.txt Engineering, 5: Zero-Trust P2P Mesh with ZothNet) into /home/zoth/NullAITech/growth-distribution/submissions/devto_hashnode_5_part_series.md. Broadcast via zoth_bridge_post.",
+        "Write 5 complete, code-rich technical tutorials (1: Orchestrating 4 Nous Hermes Agents Under $0.15/Week, 2: Zero-Cloud JWT & Env Secret Auditing in WebCrypto, 3: Building an Amnesic Debian 13 AI Workstation with ZOTHOS, 4: AEO Schema.org @graph & llms.txt Engineering, 5: Zero-Trust P2P Mesh with ZothNet) into ~/NullAITech/growth-distribution/submissions/devto_hashnode_5_part_series.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 11E — Interactive Terminal Demo & Charm VHS / Asciinema Scripts for ZOTHOS CLI",
-        "Create ready-to-record Charm VHS `.tape` scripts and Asciinema bash demo scripts showcasing `zoth-hermes-swarm`, `sovereign-agent-bridge`, `envguard`, and `jwt-inspector-guard` in action. Save to /home/zoth/NullAITech/growth-distribution/docs/cli_demo_tapes_and_scripts.md and broadcast via zoth_bridge_post.",
+        "Create ready-to-record Charm VHS `.tape` scripts and Asciinema bash demo scripts showcasing `zoth-hermes-swarm`, `sovereign-agent-bridge`, `envguard`, and `jwt-inspector-guard` in action. Save to ~/NullAITech/growth-distribution/docs/cli_demo_tapes_and_scripts.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 11F — Triple-Viewport Mobile (375px), Tablet (768px) & Desktop (1440px) CSS Audit",
-        "Inspect responsive viewport meta tags and CSS layout rules across zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, and nullai2026. Write a Triple-Viewport Responsiveness & Touch Target Audit to /home/zoth/NullAITech/growth-distribution/audits/wave11_triple_viewport_ergonomics.md and broadcast via zoth_bridge_post.",
+        "Inspect responsive viewport meta tags and CSS layout rules across zoth-os-website, zothos-lite, zothnet-website, zoth-studio-v2, world-of-zoth, and nullai2026. Write a Triple-Viewport Responsiveness & Touch Target Audit to ~/NullAITech/growth-distribution/audits/wave11_triple_viewport_ergonomics.md and broadcast via zoth_bridge_post.",
     ),
     # --- PHASE 3: MCP Registries, Fediverse/LinkedIn, CTF/University Labs & Multilingual AEO (Waves 12A-12F) ---
     (
         "zoth-builder",
         6,
         "Wave 12A — Model Context Protocol (MCP) Registry Submission Kit (mcp.so, Smithery, Glama)",
-        "Inspect /home/zoth/NullAITech/hermes-zoth and /home/zoth/NullAITech/sovereign-agent-bridge. Build complete MCP server registry manifests, JSON schemas, and submission copy for mcp.so, Smithery.ai, Glama.ai, PulseMCP, and Official MCP Servers list into /home/zoth/NullAITech/growth-distribution/submissions/mcp_registries_submission_pack.md. Broadcast via zoth_bridge_post.",
+        "Inspect ~/NullAITech/hermes-zoth and ~/NullAITech/sovereign-agent-bridge. Build complete MCP server registry manifests, JSON schemas, and submission copy for mcp.so, Smithery.ai, Glama.ai, PulseMCP, and Official MCP Servers list into ~/NullAITech/growth-distribution/submissions/mcp_registries_submission_pack.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 12B — Mastodon (infosec.exchange / fosstodon), Bluesky & LinkedIn Launch Pack",
-        "Write 15 platform-native launch posts tailored for Mastodon (infosec.exchange, fosstodon.org), Bluesky developer feeds, and LinkedIn engineering leaders highlighting ZOTHOS, Zoth Studio, and 1nc0gn30. Save to /home/zoth/NullAITech/growth-distribution/submissions/mastodon_bluesky_linkedin_pack.md and broadcast via zoth_bridge_post.",
+        "Write 15 platform-native launch posts tailored for Mastodon (infosec.exchange, fosstodon.org), Bluesky developer feeds, and LinkedIn engineering leaders highlighting ZOTHOS, Zoth Studio, and 1nc0gn30. Save to ~/NullAITech/growth-distribution/submissions/mastodon_bluesky_linkedin_pack.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 12C — University Cybersecurity Labs, CTF Teams (HTB / TryHackMe) & Linux Club Outreach",
-        "Compile 20 targeted outreach templates and lab exercises for University Linux User Groups (LUGs), collegiate CTF teams, HackTheBox/TryHackMe communities, and cybersecurity bootcamps using ZOTHOS and Zoth Studio (100% free, zero paywalls). Save to /home/zoth/NullAITech/growth-distribution/submissions/ctf_and_university_lug_outreach.md and broadcast via zoth_bridge_post.",
+        "Compile 20 targeted outreach templates and lab exercises for University Linux User Groups (LUGs), collegiate CTF teams, HackTheBox/TryHackMe communities, and cybersecurity bootcamps using ZOTHOS and Zoth Studio (100% free, zero paywalls). Save to ~/NullAITech/growth-distribution/submissions/ctf_and_university_lug_outreach.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 12D — Zero-Paywall Open-Access & Buy Us a Coffee / Solana Support Rail Audit",
-        "Verify across all 6 flagship repos and launch packs that 100% of tools are unlocked by default with zero paywalls, and that the Stripe Buy Us a Coffee link (`https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X`) and Solana Tip address (`GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`) are accurately formatted. Save to /home/zoth/NullAITech/growth-distribution/audits/wave12_open_access_support_rail_audit.md and broadcast via zoth_bridge_post.",
+        "Verify across all 6 flagship repos and launch packs that 100% of tools are unlocked by default with zero paywalls, and that the Stripe Buy Us a Coffee link (`https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X`) and Solana Tip address (`GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`) are accurately formatted. Save to ~/NullAITech/growth-distribution/audits/wave12_open_access_support_rail_audit.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 12E — Automated Launch Dispatcher & Rollout Sequencer Blueprint",
-        "Design a rollout sequencer guide and CLI workflow in /home/zoth/NullAITech/growth-distribution/docs/automated_launch_dispatcher_guide.md that coordinates GitHub Awesome-List PRs, Show HN timing, Reddit community posts, and X video threads over a 14-day launch sprint without triggering rate limits.",
+        "Design a rollout sequencer guide and CLI workflow in ~/NullAITech/growth-distribution/docs/automated_launch_dispatcher_guide.md that coordinates GitHub Awesome-List PRs, Show HN timing, Reddit community posts, and X video threads over a 14-day launch sprint without triggering rate limits.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 12F — Global Multilingual SEO/AEO Landing & Directory Pack (ES, DE, JA, PT, FR)",
-        "Create localized product descriptions, taglines, and FAQ JSON-LD snippets in Spanish, German, Japanese, Portuguese, and French for ZOTHOS, Zoth Studio v2, and ZothNet to capture international developer & security search traffic. Save to /home/zoth/NullAITech/growth-distribution/submissions/multilingual_global_aeo_pack.md and broadcast via zoth_bridge_post.",
+        "Create localized product descriptions, taglines, and FAQ JSON-LD snippets in Spanish, German, Japanese, Portuguese, and French for ZOTHOS, Zoth Studio v2, and ZothNet to capture international developer & security search traffic. Save to ~/NullAITech/growth-distribution/submissions/multilingual_global_aeo_pack.md and broadcast via zoth_bridge_post.",
     ),
     # --- PHASE 4: Daemon Fleet Resilience, Obsidian Knowledge Graph & Operation II Executive Dossier (Waves 13A-13F) ---
     (
         "zoth-auditor",
         6,
         "Wave 13A — ZothOS Local Daemon Fleet (:8094-:8124, :3000, :8787, :11434) Resilience Audit",
-        "Call zoth_status and inspect local daemon health, port bindings, and systemd/process uptime across the ZothOS sovereign stack. Write a comprehensive Daemon Fleet Health & Resilience Report to /home/zoth/NullAITech/growth-distribution/audits/wave13_daemon_fleet_resilience.md and broadcast via zoth_bridge_post.",
+        "Call zoth_status and inspect local daemon health, port bindings, and systemd/process uptime across the ZothOS sovereign stack. Write a comprehensive Daemon Fleet Health & Resilience Report to ~/NullAITech/growth-distribution/audits/wave13_daemon_fleet_resilience.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 13B — Obsidian Second Brain & JSON Canvas Ecosystem Architecture Map",
-        "Generate an Obsidian-compatible knowledge graph note and embedded JSON Canvas specification mapping all 6 NullAI/Zoth flagship products, 4 Nous Hermes Swarm agents, local daemon ports, and 18 distribution channels into /home/zoth/NullAITech/growth-distribution/docs/zoth_ecosystem_knowledge_graph.md. Broadcast via zoth_bridge_post.",
+        "Generate an Obsidian-compatible knowledge graph note and embedded JSON Canvas specification mapping all 6 NullAI/Zoth flagship products, 4 Nous Hermes Swarm agents, local daemon ports, and 18 distribution channels into ~/NullAITech/growth-distribution/docs/zoth_ecosystem_knowledge_graph.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 13C — Weeks 2–4 X/Twitter Viral Video Showcase & Real-Life Zoth Cinema Expansion",
-        "Call zoth_studio_catalog and author 45 additional X/Twitter showcase posts pairing live working Zoth Studio tool videos and Real-Life World of Zoth ARRI Alexa 65 district renders for Weeks 2–4. Save to /home/zoth/NullAITech/growth-distribution/submissions/weeks_2_to_4_x_video_expansion.md and broadcast via zoth_bridge_post.",
+        "Call zoth_studio_catalog and author 45 additional X/Twitter showcase posts pairing live working Zoth Studio tool videos and Real-Life World of Zoth ARRI Alexa 65 district renders for Weeks 2–4. Save to ~/NullAITech/growth-distribution/submissions/weeks_2_to_4_x_video_expansion.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 13D — IndieHackers, Product Hunt Discussions & Hacker News Community Starters",
-        "Draft 12 high-engagement engineering discussion threads for IndieHackers, Product Hunt Discussions, DEV Forem, and Hacker News (`Ask HN`) exploring zero-cloud WebCrypto apps, ultra-low-cost multi-agent swarms ($0.10/45 runs), and sovereign Linux desktops. Save to /home/zoth/NullAITech/growth-distribution/submissions/community_discussion_starters.md and broadcast via zoth_bridge_post.",
+        "Draft 12 high-engagement engineering discussion threads for IndieHackers, Product Hunt Discussions, DEV Forem, and Hacker News (`Ask HN`) exploring zero-cloud WebCrypto apps, ultra-low-cost multi-agent swarms ($0.10/45 runs), and sovereign Linux desktops. Save to ~/NullAITech/growth-distribution/submissions/community_discussion_starters.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 13E — Master Growth & Architecture Catalog v2.0 (growth-distribution/README.md)",
-        "Scan all files in /home/zoth/NullAITech/growth-distribution/ (audits/, docs/, submissions/, swarm-runs/) and update /home/zoth/NullAITech/growth-distribution/README.md with a complete, categorized v2.0 master index covering Waves 1 through 13. Broadcast completion via zoth_bridge_post.",
+        "Scan all files in ~/NullAITech/growth-distribution/ (audits/, docs/, submissions/, swarm-runs/) and update ~/NullAITech/growth-distribution/README.md with a complete, categorized v2.0 master index covering Waves 1 through 13. Broadcast completion via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 13F — Operation Sovereign Expansion (Waves 10A-13F) Executive Dossier & ROI Scorecard",
-        "Review all deliverables from Waves 10A through 13E, verify file sizes and zero-placeholder quality, and write the comprehensive Operation II Executive Dossier & ROI Scorecard to /home/zoth/NullAITech/growth-distribution/audits/wave13_operation2_executive_dossier.md. Broadcast via zoth_bridge_post.",
+        "Review all deliverables from Waves 10A through 13E, verify file sizes and zero-placeholder quality, and write the comprehensive Operation II Executive Dossier & ROI Scorecard to ~/NullAITech/growth-distribution/audits/wave13_operation2_executive_dossier.md. Broadcast via zoth_bridge_post.",
     ),
     # --- PHASE 5: ZOTHOS Live OS Binary Parity, Zero-Paywall Verification & Video Motion Blueprints (Waves 14A-14F) ---
     (
         "zoth-builder",
         6,
         "Wave 14A — ZothOS Live OS Binary Parity & Systemd Service Hardening",
-        "Inspect /home/zoth/NullAITech/zoth-os and /usr/local/bin against all 77 tools in /home/zoth/NullAITech/zoth-studio-v2/src/data/toolsData.js. Verify CLI binary wrappers, systemd service templates, and chroot inclusion scripts. Author a complete hardening report to /home/zoth/NullAITech/growth-distribution/audits/wave14_zothos_binary_parity_and_systemd.md and broadcast via zoth_bridge_post.",
+        "Inspect ~/NullAITech/zoth-os and /usr/local/bin against all 77 tools in ~/NullAITech/zoth-studio-v2/src/data/toolsData.js. Verify CLI binary wrappers, systemd service templates, and chroot inclusion scripts. Author a complete hardening report to ~/NullAITech/growth-distribution/audits/wave14_zothos_binary_parity_and_systemd.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 14B — Zero-Paywall Support Rail & Triple-Viewport Visual Invariant Verification",
-        "Perform a full-fleet verification of the Zero-Paywall Invariant across all 77 tools and web apps: ensure zero paywalls, zero license modals, zero blur gates, and clean 'Buy Us a Coffee' (Stripe) and Solana tip address integration. Author the audit report to /home/zoth/NullAITech/growth-distribution/audits/wave14_zero_paywall_and_viewport_invariant.md and broadcast via zoth_bridge_post.",
+        "Perform a full-fleet verification of the Zero-Paywall Invariant across all 77 tools and web apps: ensure zero paywalls, zero license modals, zero blur gates, and clean 'Buy Us a Coffee' (Stripe) and Solana tip address integration. Author the audit report to ~/NullAITech/growth-distribution/audits/wave14_zero_paywall_and_viewport_invariant.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 14C — Dev.to / Hashnode 5-Part Series Publishing Payload & Social Syndication",
-        "Expand the 5-part engineering tutorial series with full Markdown content, SEO tags, cover image prompts, and code snippets ready for copy-paste publishing on Dev.to, Hashnode, Medium, and Substack. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave14_devto_hashnode_syndication.md and broadcast via zoth_bridge_post.",
+        "Expand the 5-part engineering tutorial series with full Markdown content, SEO tags, cover image prompts, and code snippets ready for copy-paste publishing on Dev.to, Hashnode, Medium, and Substack. Save to ~/NullAITech/growth-distribution/submissions/wave14_devto_hashnode_syndication.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 14D — Global Developer Directories & Open-Source AI Catalogs Reconnaissance",
-        "Scan the web for 20+ active developer tool directories, MCP registries, and open-source AI indexes (e.g. Toolify, Futurepedia, SaaSHub, AlternativeTo, OpenTools). Document exact submission URLs, tag requirements, and formatted listings in /home/zoth/NullAITech/growth-distribution/submissions/wave14_global_ai_directories.md and broadcast via zoth_bridge_post.",
+        "Scan the web for 20+ active developer tool directories, MCP registries, and open-source AI indexes (e.g. Toolify, Futurepedia, SaaSHub, AlternativeTo, OpenTools). Document exact submission URLs, tag requirements, and formatted listings in ~/NullAITech/growth-distribution/submissions/wave14_global_ai_directories.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 14E — Sovereign Agent Bridge Matrix & Signal Gateway Architecture",
-        "Design and document the end-to-end P2P agent communication architecture connecting Hermes Swarm, OpenCode, Codex, Antigravity, and Claude Code over local SSE, JSON-RPC, and encrypted Signal/Matrix channels into /home/zoth/NullAITech/growth-distribution/docs/wave14_bridge_matrix_signal_gateway.md. Broadcast via zoth_bridge_post.",
+        "Design and document the end-to-end P2P agent communication architecture connecting Hermes Swarm, OpenCode, Codex, Antigravity, and Claude Code over local SSE, JSON-RPC, and encrypted Signal/Matrix channels into ~/NullAITech/growth-distribution/docs/wave14_bridge_matrix_signal_gateway.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 14F — YouTube Shorts, TikTok & X Video Showreel Transcripts & Motion Graphics Blueprints",
-        "Author 10 high-velocity 15s and 30s video showreel scripts and motion graphics prompt recipes based on Claude Motion / Revid.ai methodology for Zoth Studio, ZOTHOS, and ZothNet. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave14_video_showreels_and_motion_blueprints.md and broadcast via zoth_bridge_post.",
+        "Author 10 high-velocity 15s and 30s video showreel scripts and motion graphics prompt recipes based on Claude Motion / Revid.ai methodology for Zoth Studio, ZOTHOS, and ZothNet. Save to ~/NullAITech/growth-distribution/submissions/wave14_video_showreels_and_motion_blueprints.md and broadcast via zoth_bridge_post.",
     ),
     # --- PHASE 6: Wearables DAT Fieldkit, OWASP Security & Phase III Executive Dossier (Waves 15A-15F) ---
     (
         "zoth-builder",
         6,
         "Wave 15A — Ray-Ban Meta Wearables DAT Fieldkit Android Streaming Bridge & RPC",
-        "Inspect /home/zoth/hackathon-copy/Zoth-Meta-Hackathon and nullai-fieldkit. Detail the Wearables DAT C++ JNI bridge, camera frame streaming, low-latency audio capture, and local AI inference RPC integration in /home/zoth/NullAITech/growth-distribution/docs/wave15_meta_wearables_streaming_rpc.md. Broadcast via zoth_bridge_post.",
+        "Inspect ~/hackathon-copy/Zoth-Meta-Hackathon and nullai-fieldkit. Detail the Wearables DAT C++ JNI bridge, camera frame streaming, low-latency audio capture, and local AI inference RPC integration in ~/NullAITech/growth-distribution/docs/wave15_meta_wearables_streaming_rpc.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 15B — Sovereign Stack OWASP Top 10 & Daemon Security Penetration Report",
-        "Conduct a comprehensive security audit of local loopback daemons (:3000, :8094, :8102, :8135, :8149). Test for CORS policies, path traversal, command injection, and input sanitization. Save the security report to /home/zoth/NullAITech/growth-distribution/audits/wave15_owasp_daemon_security_audit.md and broadcast via zoth_bridge_post.",
+        "Conduct a comprehensive security audit of local loopback daemons (:3000, :8094, :8102, :8135, :8149). Test for CORS policies, path traversal, command injection, and input sanitization. Save the security report to ~/NullAITech/growth-distribution/audits/wave15_owasp_daemon_security_audit.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-growth",
         8,
         "Wave 15C — Product Hunt & Hacker News Show HN Launch Package Optimization",
-        "Produce the final, polished launch assets for Product Hunt and Hacker News Show HN: tagline iterations, first comment, product walkthrough, founder story, and day-one community mobilization plan. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave15_ph_show_hn_optimized_launch.md and broadcast via zoth_bridge_post.",
+        "Produce the final, polished launch assets for Product Hunt and Hacker News Show HN: tagline iterations, first comment, product walkthrough, founder story, and day-one community mobilization plan. Save to ~/NullAITech/growth-distribution/submissions/wave15_ph_show_hn_optimized_launch.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-free-scout",
         8,
         "Wave 15D — Technical Podcasts, Substack Newsletters & Developer Community Directory Map",
-        "Identify and map 30+ top developer podcasts (Changelog, Latent Space, Software Engineering Daily), Linux User Groups, and AI newsletters for creator outreach with personalized pitches. Save to /home/zoth/NullAITech/growth-distribution/submissions/wave15_podcasts_newsletters_lug_map.md and broadcast via zoth_bridge_post.",
+        "Identify and map 30+ top developer podcasts (Changelog, Latent Space, Software Engineering Daily), Linux User Groups, and AI newsletters for creator outreach with personalized pitches. Save to ~/NullAITech/growth-distribution/submissions/wave15_podcasts_newsletters_lug_map.md and broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-builder",
         6,
         "Wave 15E — Neuro-Memory Daemon Karpathy LLM Wiki Synthesis & Graph Visualizer",
-        "Architect and document the Karpathy LLM Wiki auto-compilation engine and 3D visual graph explorer linking Obsidian notes, STDP synapses, and live agent memories in /home/zoth/NullAITech/growth-distribution/docs/wave15_neuro_memory_llm_wiki_visualizer.md. Broadcast via zoth_bridge_post.",
+        "Architect and document the Karpathy LLM Wiki auto-compilation engine and 3D visual graph explorer linking Obsidian notes, STDP synapses, and live agent memories in ~/NullAITech/growth-distribution/docs/wave15_neuro_memory_llm_wiki_visualizer.md. Broadcast via zoth_bridge_post.",
     ),
     (
         "zoth-auditor",
         6,
         "Wave 15F — Operation Sovereign Expansion Phase III Executive Dossier & Strategic Roadmap",
-        "Review all deliverables across Waves 14A through 15E, calculate cumulative ROI and token economics, and author the definitive Phase III Executive Dossier to /home/zoth/NullAITech/growth-distribution/audits/wave15_operation3_executive_dossier.md. Broadcast via zoth_bridge_post.",
+        "Review all deliverables across Waves 14A through 15E, calculate cumulative ROI and token economics, and author the definitive Phase III Executive Dossier to ~/NullAITech/growth-distribution/audits/wave15_operation3_executive_dossier.md. Broadcast via zoth_bridge_post.",
     ),
 ]
 

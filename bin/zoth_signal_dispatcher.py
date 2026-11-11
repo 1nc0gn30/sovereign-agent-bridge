@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """⚡ ZOTH STUDIO — Sovereign Signal Swarm Bridge & Remote NOC
 =============================================================================
-Bridges Signal Messenger on your phone (+19482047987) with:
+Bridges Signal Messenger on your phone (+15550000000) with:
   • Immediate < 100ms ACK delivery notification
   • Periodic / on-demand heartbeats with live temps, RAM, and CPU telemetry
   • Direct arbitrary shell / command execution (/cmd, /sh, $)
@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # Base paths & logging
-PHONE_NUMBER = os.environ.get("SIGNAL_ACCOUNT", "+19482047987")
+PHONE_NUMBER = os.environ.get("SIGNAL_ACCOUNT", "+15550000000")
 SOCKET_PATH = os.environ.get("SIGNAL_SOCKET_PATH", "/tmp/signal-cli.sock")
 AGY_BIN = shutil.which("agy") or "~/.local/bin/agy"
 AZOTH_DIR = Path("~/NullAITech/azoth-local-agent")
@@ -723,13 +723,13 @@ def handle_incoming_text(text: str, client: SignalRpcClient) -> None:
 
 
 def handle_incoming_voice_note(attachment: Dict[str, Any], caption: str, client: SignalRpcClient) -> None:
-    """Handle incoming spoken voice note from Neal's phone."""
+    """Handle incoming spoken voice note from the operator's phone."""
     att_id = attachment.get("id", "audio")
     mime = attachment.get("contentType", "audio/ogg")
     logger.info("Received audio voice note from Signal: ID=%s, mime=%s", att_id, mime)
 
     # 1. Immediate ACK
-    client.send_message(PHONE_NUMBER, "🎙️ [ACK] Voice transmission received from Neal. Spawning live voice call link...")
+    client.send_message(PHONE_NUMBER, "🎙️ [ACK] Voice transmission received from operator. Spawning live voice call link...")
 
     # 2. Generate live call invitation link
     call_url, session_id = create_live_call_link(channel="signal", voice=ACTIVE_VOICE)
@@ -745,7 +745,7 @@ def handle_incoming_voice_note(attachment: Dict[str, Any], caption: str, client:
     # 3. Synthesize spoken confirmation back as native voice note
     send_voice_note_reply(
         client,
-        f"Voice note received, Neal. Azoth standing by. Tap the link to speak live.",
+        f"Voice note received. Azoth standing by. Tap the link to speak live.",
         voice_name=ACTIVE_VOICE,
     )
 

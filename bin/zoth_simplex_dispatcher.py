@@ -424,7 +424,7 @@ class SimpleXBridge:
                         recipient = str(body.get("recipient") or "").strip().lstrip("@")
                         if not recipient:
                             contacts = sorted(list(bridge_ref.connected_contacts))
-                            recipient = contacts[0] if contacts else "neal"
+                            recipient = contacts[0] if contacts else "1nc0gn30"
                         if not text:
                             self._send_json(400, {"error": "Message text is required"})
                             return

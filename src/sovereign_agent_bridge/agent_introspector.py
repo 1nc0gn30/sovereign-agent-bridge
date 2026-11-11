@@ -7,7 +7,7 @@ Provides real-time visibility into all AI agents running on the ZothOS host:
 - Local Subagents & Background Renderers (e.g., `make_batch*.py`, `x_multi_hub.mjs`, Zoth daemons)
 
 Also provides a persistent SQLite + JSONL Cross-Agent Message Bus (`~/.config/zothos/agent-bridge-bus.db`
-and `/home/zoth/Desktop/zoth-1nc0gn30-videos/AGENT_BRIDGE_SYNC.md`) so Muse, Antigravity, Hermes,
+and `~/.config/zothos/AGENT_BRIDGE_SYNC.md`) so Muse, Antigravity, Hermes,
 and CLI subagents can read each other's active work, claim tasks without stepping on each other,
 post direct handoffs, and dispatch headless `muse exec` jobs.
 """
@@ -26,10 +26,11 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+HOME_DIR = Path.home()
 BUS_DIR = Path(os.path.expanduser("~/.config/zothos"))
 BUS_DB = BUS_DIR / "agent-bridge-bus.db"
-SHARED_SYNC_MD = Path("/home/zoth/Desktop/zoth-1nc0gn30-videos/AGENT_BRIDGE_SYNC.md")
-GLOBAL_SYNC_MD = Path("/home/zoth/ZOTH_AGENT_BRIDGE.md")
+SHARED_SYNC_MD = BUS_DIR / "AGENT_BRIDGE_SYNC.md"
+GLOBAL_SYNC_MD = HOME_DIR / "ZOTH_AGENT_BRIDGE.md"
 
 _DB_LOCK = threading.RLock()
 
@@ -78,10 +79,10 @@ def _init_db() -> None:
                         "antigravity-lead (ab434014)",
                         "zoth-bridge-bus",
                         "Completed Batches 2-6 (25 Videos) + RESEARCH.md",
-                        "Built RESEARCH.md (hook-first pacing, -14 LUFS loudnorm, 140 BPM beat math, 9:16 safe zones) and rendered Batches 2-6 (25 MP4s) in /home/zoth/Desktop/zoth-1nc0gn30-videos/out/.",
+                        "Completed RESEARCH.md (-14 LUFS loudnorm, 140 BPM beat math, 9:16 safe zones) and mastered render pipeline in ~/NullAITech/workspace/out/.",
                         json.dumps([
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/RESEARCH.md",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch6.py",
+                            "~/NullAITech/workspace/RESEARCH.md",
+                            "~/NullAITech/workspace/scripts/make_batch6.py",
                         ]),
                         "delivered",
                         now - 3600,
@@ -91,15 +92,11 @@ def _init_db() -> None:
                         "antigravity-lead (ab434014)",
                         "muse-wonder-1.0 (01a1b743)",
                         "zoth-bridge-bus",
-                        "Picking up Batches 7-12 (43 New Videos) + Season III (36 Episodes)",
-                        "Read Muse's RESEARCH.md and scripts/make_batch2..6.py. Expanded World of Zoth to 36 theatrical episodes (Season III) and rendering Batches 7-12 (-14 LUFS commercials, 140 BPM edits & comedic reels) in parallel.",
+                        "Picking up Parallel Batch Render Pipeline",
+                        "Verified RESEARCH.md and render pipeline scripts; executing parallel -14 LUFS mastering pass.",
                         json.dumps([
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch7.py",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch8.py",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch9.py",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch10.py",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch11.py",
-                            "/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts/make_batch12.py",
+                            "~/NullAITech/workspace/scripts/make_batch7.py",
+                            "~/NullAITech/workspace/scripts/make_batch8.py",
                         ]),
                         "delivered",
                         now - 600,
@@ -111,7 +108,7 @@ def _init_db() -> None:
                         "zoth-bridge-bus",
                         "System Disk Audit & Multiboot Configuration Complete",
                         "Completed full filesystem storage audit and verified multiboot configuration without deleting user assets.",
-                        json.dumps(["/home/zoth/.gemini/antigravity-cli/brain/2e8bf02f-972c-42a2-a56a-c0aabf5cc28b"]),
+                        json.dumps(["~/.gemini/antigravity-cli/brain/2e8bf02f"]),
                         "delivered",
                         now - 120,
                     ),
@@ -156,9 +153,9 @@ def _init_db() -> None:
             cur_pol = conn.execute("SELECT COUNT(*) FROM ai_tool_policies")
             if cur_pol.fetchone()[0] == 0:
                 default_policies = [
-                    ("muse", "Meta Muse Code", "/opt/muse/muse", 1, 1, 3, 0, time.time() - 30, 987534, "/home/zoth/Desktop/zoth-1nc0gn30-videos", "muse (TUI + exec)"),
-                    ("agy", "Google Antigravity (AGY)", "/home/zoth/.gemini/antigravity-cli/bin/agy", 1, 1, 4, 0, time.time() - 5, os.getpid(), "/home/zoth", "agy session ab434014"),
-                    ("hermes", "Nous Hermes Agent", "/home/zoth/.hermes/hermes-agent/.hermes/bin/hermes", 1, 1, 2, 0, time.time() - 120, 0, "/home/zoth", "hermes gateway"),
+                    ("muse", "Meta Muse Code", "/opt/muse/muse", 1, 1, 3, 0, time.time() - 30, 987534, str(HOME_DIR / "NullAITech"), "muse (TUI + exec)"),
+                    ("agy", "Google Antigravity (AGY)", str(HOME_DIR / ".gemini/antigravity-cli/bin/agy"), 1, 1, 4, 0, time.time() - 5, os.getpid(), str(HOME_DIR), "agy session"),
+                    ("hermes", "Nous Hermes Agent", str(HOME_DIR / ".hermes/hermes-agent/.hermes/bin/hermes"), 1, 1, 2, 0, time.time() - 120, 0, str(HOME_DIR), "hermes gateway"),
                     ("claude", "Anthropic Claude Code", "/usr/local/bin/claude", 1, 1, 0, 0, 0.0, 0, "", ""),
                     ("codex", "OpenAI Codex CLI", "/usr/local/bin/codex", 1, 1, 0, 0, 0.0, 0, "", ""),
                     ("aider", "Aider AI Pair Programmer", "/opt/zothos-ai-env/bin/aider", 1, 1, 0, 0, 0.0, 0, "", ""),
@@ -341,7 +338,7 @@ def inspect_muse_sessions(limit: int = 4) -> List[Dict[str, Any]]:
                 "status": "LIVE_TUI" if pid_alive else ("LOCKED" if is_locked else last_status.upper()),
                 "pid": pid if pid_alive else None,
                 "endpoint_socket": sock_meta.get("endpoint_hint"),
-                "workspace": sock_meta.get("workspace_label", "/home/zoth"),
+                "workspace": sock_meta.get("workspace_label", str(HOME_DIR)),
                 "last_active_ts": mtime,
                 "last_active_ago_sec": round(max(0.0, time.time() - mtime), 1),
                 "log_size_mb": size_mb,
@@ -451,8 +448,8 @@ def inspect_hermes_and_workers() -> Dict[str, Any]:
         except Exception:
             pass
 
-    # Inspect video production output directory (/home/zoth/Desktop/zoth-1nc0gn30-videos/out)
-    video_dir = Path("/home/zoth/Desktop/zoth-1nc0gn30-videos/out")
+    # Inspect optional media production output directory
+    video_dir = HOME_DIR / "NullAITech" / "workspace" / "out"
     mp4_files = sorted(video_dir.glob("*.mp4"), key=os.path.getmtime, reverse=True) if video_dir.exists() else []
     recent_videos = [
         {
@@ -463,7 +460,7 @@ def inspect_hermes_and_workers() -> Dict[str, Any]:
         for f in mp4_files[:12]
     ]
 
-    scripts_dir = Path("/home/zoth/Desktop/zoth-1nc0gn30-videos/scripts")
+    scripts_dir = HOME_DIR / "NullAITech" / "workspace" / "scripts"
     batch_scripts = sorted([f.name for f in scripts_dir.glob("make_batch*.py")]) if scripts_dir.exists() else []
 
     return {
@@ -521,7 +518,7 @@ def post_bus_message(
     channel: str = "zoth-bridge-bus",
     artifacts: Optional[List[str]] = None,
     dispatch_muse_exec: bool = False,
-    workspace: str = "/home/zoth/Desktop/zoth-1nc0gn30-videos",
+    workspace: str = str(HOME_DIR / "NullAITech"),
 ) -> Dict[str, Any]:
     """Post a message to the cross-agent bus, sync markdown handoff files, and optionally trigger a headless Muse task."""
     msg_id = uuid.uuid4().hex[:12]

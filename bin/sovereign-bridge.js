@@ -32,37 +32,20 @@ if (isWeb) {
 } else if (isAppRequest) {
   console.log('⚡ Launching Sovereign Agent Bridge Desktop Workstation...');
   
-  // Find Electron in local node_modules, sibling micro-repos, or system PATH
+  // Find Electron in local node_modules, sibling repositories, or system PATH
   const candidateElectronPaths = [
     path.join(rootDir, 'node_modules', '.bin', 'electron'),
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/zoth-micro-repos/NullAI-HexStrike-AI-Terminal/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/zoth-micro-repos/promptmaster-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/zoth-micro-repos/jwt-inspector-guard/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/zoth-micro-repos/envguard-secrets-vault/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/cron-rhythm-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/regex-droid-builder/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/schema-illustrator-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/payload-entropy-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/audiocipher-stego-engine/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/pwa-manifest-builder/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/certpath-roadmap-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/subsweep-lead-scanner/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/web-security-guard/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/cwv-speed-engine/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/vector-search-engine/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/neuro-memory-daemon/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/aeo-graph-engine/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/polyglot-framework-exporter/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/zoth-webgen/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/deepsearch-research-agent/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/omnipost-social-engine/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/nexus-3d-scene-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/datamosh-glitch-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/cyber-turtle-studio/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/badge3d-coin-generator/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/ufo-sacred-geometry/node_modules/.bin/electron',
-    '/media/neo/f2fdda77-178b-4603-ae80-c7aa4cd97908/vision-gesture-control/node_modules/.bin/electron',
   ];
+  try {
+    const parentDir = path.resolve(rootDir, '..');
+    for (const entry of fs.readdirSync(parentDir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        candidateElectronPaths.push(path.join(parentDir, entry.name, 'node_modules', '.bin', 'electron'));
+      }
+    }
+  } catch (_) {
+    // Ignore unreadable parent directory
+  }
 
   let electronCmd = 'electron';
   for (const p of candidateElectronPaths) {

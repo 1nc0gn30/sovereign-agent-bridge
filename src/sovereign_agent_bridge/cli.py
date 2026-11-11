@@ -1219,7 +1219,7 @@ def handle_handoff(args: argparse.Namespace) -> int:
         subject=getattr(args, "subject", "Cross-Agent Handoff"),
         body=args.message,
         dispatch_muse_exec=getattr(args, "exec_muse", False),
-        workspace=getattr(args, "workspace", "/home/zoth/Desktop/zoth-1nc0gn30-videos"),
+        workspace=getattr(args, "workspace", os.path.expanduser("~/NullAITech")),
     )
     if getattr(args, "json", False):
         print(json.dumps(rec, indent=2))
@@ -1357,7 +1357,7 @@ def handle_gatekeep(args: argparse.Namespace) -> int:
     env["ZOTH_BRIDGE_AUTHORIZED"] = "1"
     env["ZOTH_BRIDGE_LEASE_ID"] = lease_id
     env["ZOTH_BRIDGE_URL"] = bridge_url
-    env["ZOTH_BRIDGE_SYNC_MD"] = str(auth_data.get("sync_md", "/home/zoth/Desktop/zoth-1nc0gn30-videos/AGENT_BRIDGE_SYNC.md"))
+    env["ZOTH_BRIDGE_SYNC_MD"] = str(auth_data.get("sync_md", os.path.expanduser("~/.config/zothos/AGENT_BRIDGE_SYNC.md")))
 
     rc = 0
     try:
@@ -1492,7 +1492,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_ho.add_argument("--sender", "--from", dest="sender", default="antigravity-lead", help="Sender agent ID.")
     p_ho.add_argument("--subject", default="Cross-Agent Handoff", help="Message subject line.")
     p_ho.add_argument("--exec-muse", action="store_true", help="Also spawn a headless `muse exec` worker for this handoff.")
-    p_ho.add_argument("--workspace", default="/home/zoth/Desktop/zoth-1nc0gn30-videos", help="Workspace for headless muse exec.")
+    p_ho.add_argument("--workspace", default=os.path.expanduser("~/NullAITech"), help="Workspace for headless muse exec.")
 
     # policy (AI tool gatekeeper policies)
     p_pol = subparsers.add_parser("policy", parents=[common_parent], help="Inspect or toggle Sovereign Bridge AI Tool Gatekeeper policies.")

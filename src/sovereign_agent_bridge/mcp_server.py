@@ -679,7 +679,7 @@ class MCPServer:
         import urllib.request
         start_t = time.monotonic()
         ch = channel.lower().strip()
-        default_signal = os.environ.get("SIGNAL_ACCOUNT", "+19482047987")
+        default_signal = os.environ.get("SIGNAL_ACCOUNT", "+15550000000")
         signal_sock = os.environ.get("SIGNAL_SOCKET_PATH", "/tmp/signal-cli.sock")
 
         if ch == "signal":
@@ -728,7 +728,7 @@ class MCPServer:
                     logger.warning("Signal socket send failed: %s", e)
 
         elif ch == "simplex":
-            target = (recipient or "neal").lstrip("@")
+            target = (recipient or "1nc0gn30").lstrip("@")
             try:
                 req_data = json.dumps({"recipient": target, "message": message}).encode("utf-8")
                 req = urllib.request.Request(
@@ -767,7 +767,7 @@ class MCPServer:
             if not str(agent_id).startswith("simplex:"):
                 try:
                     sx_msg = f"🌐 [SimpleX-Matrix Bridge · {agent_id}]\n{message}"
-                    req_data = json.dumps({"recipient": "neal", "message": sx_msg}).encode("utf-8")
+                    req_data = json.dumps({"recipient": "1nc0gn30", "message": sx_msg}).encode("utf-8")
                     req = urllib.request.Request(
                         "http://127.0.0.1:8767/api/simplex/send",
                         data=req_data,
@@ -794,7 +794,7 @@ class MCPServer:
                     routed.append(sub_ch)
             return {
                 "status": "DELIVERED",
-                "recipient": recipient or "neal / +19482047987",
+                "recipient": recipient or "1nc0gn30 / +15550000000",
                 "channels_routed": routed or ["auto"],
                 "delivery_latency_ms": round((time.monotonic() - start_t) * 1000.0, 1),
             }
@@ -887,7 +887,7 @@ class MCPServer:
 
         signal_sock = os.environ.get("SIGNAL_SOCKET_PATH", "/tmp/signal-cli.sock")
         signal_live = os.path.exists(signal_sock)
-        signal_account = os.environ.get("SIGNAL_ACCOUNT", "+19482047987")
+        signal_account = os.environ.get("SIGNAL_ACCOUNT", "+15550000000")
 
         simplex_live = False
         try:
