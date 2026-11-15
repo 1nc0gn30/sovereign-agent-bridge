@@ -34,10 +34,37 @@ from typing import Any, Dict, List, Optional, Tuple
 # Base paths & logging
 PHONE_NUMBER = os.environ.get("SIGNAL_ACCOUNT", "+15550000000")
 SOCKET_PATH = os.environ.get("SIGNAL_SOCKET_PATH", "/tmp/signal-cli.sock")
-AGY_BIN = shutil.which("agy") or "~/.local/bin/agy"
-AZOTH_DIR = Path("~/NullAITech/azoth-local-agent")
-WORKSPACE_DIR = Path("~")
-LOG_PATH = Path("~/.local/state/zoth-signal-dispatcher.log")
+HOME_DIR = Path.home()
+WORKSPACE_DIR = HOME_DIR
+AGY_BIN = shutil.which("agy") or str(HOME_DIR / ".local" / "bin" / "agy")
+
+
+def resolve_azoth_dir(raw: "str | Path") -> Path:
+    """Resolve the azoth-local-agent dir, tolerating a literal '~' segment.
+
+    pathlib.Path does NOT expand '~': Path("~/x") stays the literal string and
+    only becomes real relative to the cwd, which breaks both the script path and
+    subprocess.run(cwd=...) with FileNotFoundError ("azoth folder was not
+    found"). Accept tilde or absolute input and return the first candidate that
+    actually contains agent.py; otherwise return the expanded path.
+    """
+    expanded = Path(str(raw)).expanduser()
+    candidates = [
+        expanded,
+        HOME_DIR / "NullAITech" / "azoth-local-agent",
+        WORKSPACE_DIR / "azoth-local-agent",
+    ]
+    for cand in candidates:
+        try:
+            if (cand / "agent.py").is_file():
+                return cand
+        except OSError:
+            continue
+    return expanded
+
+
+AZOTH_DIR = resolve_azoth_dir(os.environ.get("AZOTH_DIR", "~/NullAITech/azoth-local-agent"))
+LOG_PATH = HOME_DIR / ".local" / "state" / "zoth-signal-dispatcher.log"
 LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 MAX_CHUNK_SIZE = 3500
@@ -51,6 +78,10 @@ logging.basicConfig(
     ],
 )
 logger = logging.getLogger("zoth_signal_dispatcher")
+logger.info(
+    "Dispatcher boot: cwd=%s home=%s | azoth_dir=%s (agent.py present: %s) | log=%s",
+    Path.cwd(), HOME_DIR, AZOTH_DIR, (AZOTH_DIR / "agent.py").is_file(), LOG_PATH,
+)
 
 # Heartbeat configuration
 HEARTBEAT_INTERVAL_SECONDS = 300  # 5 minutes
@@ -265,6 +296,14 @@ def execute_agent_prompt(target_agent: str, prompt: str, client: Optional[Signal
     ticker_thread.start()
 
     try:
+        if target in ("azoth", "default", "hermes", "codex", "claude", "gemini", "ollama") and not (AZOTH_DIR / "agent.py").is_file():
+            logger.error("Azoth agent.py missing under AZOTH_DIR=%s", AZOTH_DIR)
+            return (
+                f"⚠️ Azoth agent not found: {AZOTH_DIR}/agent.py is missing.\n"
+                "Fix AZOTH_DIR (systemd unit Environment=AZOTH_DIR=...) or restore "
+                "/home/zoth/NullAITech/azoth-local-agent."
+            )
+
         if target in ("agy", "antigravity"):
             cmd = [AGY_BIN, "-p", prompt, "--dangerously-skip-permissions"]
             proc = subprocess.run(cmd, cwd=str(WORKSPACE_DIR), capture_output=True, text=True, timeout=1800)

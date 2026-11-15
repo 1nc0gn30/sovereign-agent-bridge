@@ -133,6 +133,8 @@ python3 -m pytest -q
 
 ## Attribution & Support
 
-Engineered by **1nc0gn30** ([@1nc0gn30](https://github.com/1nc0gn30) · [1nc0gn30.si](https://1nc0gn30.si)) · [NullAI](https://nullai.tech) · Cataloged in [Zoth Studio](https://zoth.nullai.tech).
+Engineered by **Neal Frazier Tech** (`@1nc0gn30`, [github.com/1nc0gn30/sovereign-agent-bridge](https://github.com/1nc0gn30/sovereign-agent-bridge)) • [NullAI Platform](https://nullai.tech) • Cataloged in [Zoth Studio](https://zoth.nullai.tech).
 
+- 100% Free & Open Access — Zero paywalls, zero login gates.
 - Optional support: [Buy Us a Coffee (Stripe)](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
+- Solana Tip Address: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK` (`solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`)

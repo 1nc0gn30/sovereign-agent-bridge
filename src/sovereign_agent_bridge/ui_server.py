@@ -424,7 +424,7 @@ class BridgeRequestHandler(SimpleHTTPRequestHandler):
             return
 
         # 2. Health check
-        if path == "/api/health":
+        if path in ("/health", "/api/health"):
             self._send_json_response({
                 "status": "ok",
                 "service": "sovereign-agent-bridge",
