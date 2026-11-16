@@ -138,3 +138,24 @@ Engineered by **Neal Frazier Tech** (`@1nc0gn30`, [github.com/1nc0gn30/sovereign
 - 100% Free & Open Access — Zero paywalls, zero login gates.
 - Optional support: [Buy Us a Coffee (Stripe)](https://buy.stripe.com/3cIfZg27PdKo2D64Ocfw40X)
 - Solana Tip Address: `GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK` (`solana:GG2eQbVh8ut1BK6j1A2tz7pSySdLpD38BgyEhGcxdXoK`)
+
+## Sovereign Surfaces
+
+_Machine-generated surface inventory (docs/tools/layerD_probe.py). Do not hand-edit; re-run the probe instead.
+
+**What it does.** Sovereign Agent Signal Bridge — Sovereign Agent Bridge :: Zero-dependency multi-channel messaging, MCP server, consensus engine, and dead-man switch watchdog.
+
+**Category.** Swarm & Core  ·  **Version.** 3.2.0  ·  **Execution type.** `local_cli`
+
+**Architecture & port.** Canonical source: `~/NullAITech/sovereign-agent-bridge`. Assigned `localPort` **8102** (`http://127.0.0.1:8102`).
+
+**ZothOS CLI usage.**
+
+```bash
+sovereign-agent-bridge --help     # exit 0
+sovereign-agent-bridge --json     # exit 0
+```
+
+**Zoth Studio route.** https://zoth.nullai.tech/tools/sovereign-agent-bridge
+
+_Verified 2026-11-15 across the three install surfaces (`/usr/local/bin`, `~/.local/bin`, `zoth-os/config/includes.chroot/usr/local/bin`)._
