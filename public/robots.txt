@@ -4,14 +4,22 @@ Crawl-delay: 0
 
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 0
 
 User-agent: GPTBot
 Allow: /
+Crawl-delay: 0
 
 User-agent: ClaudeBot
 Allow: /
+Crawl-delay: 0
 
 User-agent: PerplexityBot
 Allow: /
+Crawl-delay: 0
 
-Sitemap: https://1nc0gn30.github.io/sitemap.xml
+User-agent: Applebot
+Allow: /
+Crawl-delay: 0
+
+Sitemap: https://zoth.nullai.tech/tools/sovereign-agent-bridge/sitemap.xml
