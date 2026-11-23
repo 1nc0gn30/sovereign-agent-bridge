@@ -1229,6 +1229,8 @@
     async function fetchClaims() {
       try {
         const res = await fetch('/api/claims');
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) return;
         const data = await res.json();
         const container = document.getElementById('claims-container');
         if (!data.claims || data.claims.length === 0) {
@@ -1291,6 +1293,8 @@
     async function fetchWatchdog() {
       try {
         const res = await fetch('/api/watchdog');
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) return;
         const data = await res.json();
         const container = document.getElementById('watchdog-container');
         if (!data.agents || data.agents.length === 0) {
@@ -1346,6 +1350,8 @@
     async function refreshStats() {
       try {
         const res = await fetch('/api/stats');
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) return;
         const d = await res.json();
         if (d.stats) {
           document.getElementById('kpi-uptime').innerText = `${Math.round(d.stats.uptime_seconds)}s`;
@@ -1360,6 +1366,8 @@
     async function fetchLiveAgentMesh() {
       try {
         const res = await fetch('/api/agents/live');
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) return;
         const snap = await res.json();
         const s = snap.summary || {};
         const badge = document.getElementById('mesh-summary-badge');
