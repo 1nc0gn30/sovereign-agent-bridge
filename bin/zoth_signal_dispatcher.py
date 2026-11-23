@@ -862,8 +862,8 @@ def run_daemon() -> None:
         bufsize=1,
     )
 
-    # Wait for socket to become available
-    for _ in range(30):
+    # Wait for socket to become available (30s for cold-boot JVM startup)
+    for _ in range(60):
         if os.path.exists(SOCKET_PATH):
             break
         time.sleep(0.5)
